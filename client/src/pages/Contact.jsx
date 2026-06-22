@@ -1,4 +1,5 @@
 import { useState } from "react";
+import "../index.css";
 
 /* ─── Design tokens ─────────────────────────────────────────────────────── */
 const GOLD = "#D4AF37";
@@ -96,6 +97,12 @@ const FacebookIcon = () => (
   </svg>
 );
 
+const TelegramIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M21.5 2.5L2.9 9.7c-1.3.5-1.3 1.2-.2 1.5l4.8 1.5 11.1-7c.5-.3 1-.1.6.3l-9 8.1-.3 4.8c.4 0 .6-.2.9-.4l2.3-2.2 4.7 3.5c.9.5 1.5.2 1.7-.8l3.2-15.1c.3-1.2-.4-1.8-1.2-1.2z" />
+  </svg>
+);
+
 /* ─── Hover social button ────────────────────────────────────────────────── */
 function SocialBtn({ href, label, children }) {
   const [hov, setHov] = useState(false);
@@ -159,318 +166,6 @@ function InfoBlock({ icon, label, children }) {
 const Contact = () => {
   return (
     <>
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,400&family=Inter:wght@300;400;500;600&display=swap');
-        *, *::before, *::after { box-sizing: border-box; }
-
-        .contact-root {
-          background: #000;
-          color: #fff;
-          font-family: 'Inter', sans-serif;
-          min-height: 100vh;
-          position: relative;
-          overflow-x: hidden;
-        }
-
-        /* Ambient background glows */
-        .contact-root::before {
-          content: '';
-          position: fixed;
-          top: -20%;
-          left: 50%;
-          transform: translateX(-50%);
-          width: 800px;
-          height: 500px;
-          background: radial-gradient(ellipse, rgba(212,175,55,0.05) 0%, transparent 65%);
-          pointer-events: none;
-          z-index: 0;
-        }
-        .contact-root::after {
-          content: '';
-          position: fixed;
-          bottom: 0;
-          right: -10%;
-          width: 500px;
-          height: 400px;
-          background: radial-gradient(ellipse, rgba(255,255,255,0.02) 0%, transparent 70%);
-          pointer-events: none;
-          z-index: 0;
-        }
-
-        .contact-inner {
-          position: relative;
-          z-index: 1;
-          max-width: 1140px;
-          margin: 0 auto;
-          padding: 140px 40px 100px;
-        }
-
-        /* ── Hero ── */
-        .hero-section {
-          text-align: center;
-          margin-bottom: 96px;
-        }
-        .hero-eyebrow {
-          font-size: 10px;
-          letter-spacing: 0.32em;
-          text-transform: uppercase;
-          color: ${GOLD};
-          margin-bottom: 20px;
-          display: block;
-          opacity: 0.8;
-        }
-        .hero-heading {
-          font-family: 'Playfair Display', Georgia, serif;
-          font-size: clamp(3.5rem, 9vw, 8rem);
-          font-weight: 900;
-          letter-spacing: -0.03em;
-          line-height: 1;
-          margin: 0 0 24px;
-          color: #fff;
-        }
-        .hero-heading em {
-          font-style: italic;
-          font-weight: 400;
-          color: ${GOLD};
-          opacity: 0.9;
-        }
-        .hero-sub {
-          font-size: 15px;
-          color: rgba(255,255,255,0.35);
-          font-weight: 300;
-          letter-spacing: 0.02em;
-          max-width: 360px;
-          margin: 0 auto;
-          line-height: 1.7;
-        }
-
-        /* ── Gold hairline divider ── */
-        .gold-rule {
-          width: 48px;
-          height: 1px;
-          background: linear-gradient(to right, transparent, ${GOLD}, transparent);
-          margin: 0 auto 28px;
-        }
-
-        /* ── Main grid ── */
-        .contact-grid {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 40px;
-          align-items: start;
-        }
-
-        /* ── Left: contact details ── */
-        .contact-left {
-          display: flex;
-          flex-direction: column;
-          gap: 48px;
-        }
-
-        /* Phone — dominant display treatment */
-        .phone-display {
-          display: flex;
-          flex-direction: column;
-          gap: 8px;
-        }
-        .phone-number {
-          font-family: 'Playfair Display', Georgia, serif;
-          font-size: clamp(2.4rem, 5vw, 4.5rem);
-          font-weight: 700;
-          letter-spacing: -0.03em;
-          line-height: 1;
-          color: #fff;
-          text-decoration: none;
-          display: inline-block;
-          position: relative;
-          transition: color 0.3s ease;
-          text-shadow: 0 0 60px rgba(212,175,55,0.15);
-        }
-        .phone-number:hover {
-          color: ${GOLD};
-          text-shadow: 0 0 40px rgba(212,175,55,0.3);
-        }
-
-        /* Email links */
-        .email-link {
-          display: block;
-          font-size: 15px;
-          color: rgba(255,255,255,0.6);
-          text-decoration: none;
-          letter-spacing: 0.01em;
-          font-weight: 400;
-          transition: color 0.25s;
-          padding: 3px 0;
-        }
-        .email-link:hover { color: #fff; }
-
-        /* Location text */
-        .location-text {
-          font-size: 15px;
-          color: rgba(255,255,255,0.7);
-          line-height: 1.6;
-        }
-        .location-sub {
-          font-size: 13px;
-          color: rgba(255,255,255,0.3);
-          margin-top: 4px;
-        }
-
-        /* Response note */
-        .response-note {
-          font-size: 12px;
-          color: rgba(255,255,255,0.22);
-          letter-spacing: 0.04em;
-          padding-top: 24px;
-          border-top: 1px solid rgba(255,255,255,0.06);
-          line-height: 1.7;
-        }
-
-        /* ── Right: brand card + social ── */
-        .contact-right {
-          display: flex;
-          flex-direction: column;
-          gap: 24px;
-          position: sticky;
-          top: 100px;
-        }
-
-        /* Glass brand card */
-        .brand-card {
-          background: rgba(255,255,255,0.025);
-          border: 1px solid rgba(255,255,255,0.07);
-          backdrop-filter: blur(24px);
-          -webkit-backdrop-filter: blur(24px);
-          border-radius: 24px;
-          padding: 44px 40px;
-          position: relative;
-          overflow: hidden;
-        }
-        .brand-card::before {
-          content: '';
-          position: absolute;
-          top: -60px;
-          right: -60px;
-          width: 200px;
-          height: 200px;
-          background: radial-gradient(circle, rgba(212,175,55,0.07) 0%, transparent 70%);
-          pointer-events: none;
-        }
-        .brand-wordmark {
-          font-size: 11px;
-          font-weight: 700;
-          letter-spacing: 0.22em;
-          text-transform: uppercase;
-          margin-bottom: 24px;
-          display: block;
-        }
-        .brand-wordmark .tech  { color: #fff; }
-        .brand-wordmark .photo { color: ${GOLD}; opacity: 0.8; margin-left: 5px; }
-
-        .brand-card-title {
-          font-family: 'Playfair Display', Georgia, serif;
-          font-size: clamp(20px, 2.5vw, 28px);
-          font-weight: 700;
-          letter-spacing: -0.01em;
-          color: #fff;
-          margin-bottom: 14px;
-          line-height: 1.2;
-        }
-        .brand-card-desc {
-          font-size: 13px;
-          color: rgba(255,255,255,0.42);
-          line-height: 1.8;
-          margin-bottom: 20px;
-        }
-        .brand-card-sub {
-          font-size: 10px;
-          letter-spacing: 0.22em;
-          text-transform: uppercase;
-          color: ${GOLD};
-          opacity: 0.6;
-        }
-        .brand-card-rule {
-          width: 100%;
-          height: 1px;
-          background: linear-gradient(to right, ${GOLD}30, transparent);
-          margin: 28px 0 0;
-        }
-
-        /* Social panel */
-        .social-panel {
-          background: rgba(255,255,255,0.02);
-          border: 1px solid rgba(255,255,255,0.06);
-          border-radius: 20px;
-          padding: 28px 32px;
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          gap: 16px;
-        }
-        .social-label {
-          font-size: 10px;
-          letter-spacing: 0.26em;
-          text-transform: uppercase;
-          color: rgba(255,255,255,0.25);
-          font-weight: 500;
-          flex-shrink: 0;
-        }
-        .social-icons {
-          display: flex;
-          gap: 10px;
-          flex-wrap: wrap;
-        }
-
-        /* ── CTA section ── */
-        .cta-section {
-          text-align: center;
-          padding: 100px 20px 0;
-        }
-        .cta-eyebrow {
-          font-size: 10px;
-          letter-spacing: 0.3em;
-          text-transform: uppercase;
-          color: rgba(255,255,255,0.25);
-          margin-bottom: 24px;
-          display: block;
-        }
-        .cta-title {
-          font-family: 'Playfair Display', Georgia, serif;
-          font-size: clamp(2rem, 5vw, 4rem);
-          font-weight: 700;
-          letter-spacing: -0.025em;
-          color: #fff;
-          line-height: 1.1;
-          margin-bottom: 20px;
-        }
-        .cta-title em {
-          font-style: italic;
-          font-weight: 400;
-          color: ${GOLD};
-        }
-        .cta-tags {
-          font-size: 12px;
-          letter-spacing: 0.2em;
-          text-transform: uppercase;
-          color: rgba(255,255,255,0.2);
-        }
-
-        /* ── Responsive ── */
-        @media (max-width: 768px) {
-          .contact-inner { padding: 120px 24px 80px; }
-          .hero-section { margin-bottom: 64px; }
-          .contact-grid { grid-template-columns: 1fr; gap: 32px; }
-          .contact-right { position: static; }
-          .brand-card { padding: 32px 28px; }
-          .social-panel { flex-direction: column; align-items: flex-start; }
-          .cta-section { padding: 72px 0 0; }
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-          * { transition: none !important; }
-        }
-      `}</style>
-
       <div className="contact-root">
         <div className="contact-inner">
           {/* ── 1. HERO ──────────────────────────────────────────────── */}
@@ -493,8 +188,8 @@ const Contact = () => {
               {/* Phone — visually dominant */}
               <InfoBlock icon={<PhoneIcon />} label="Direct Line">
                 <div className="phone-display">
-                  <a href="tel:+15551234567" className="phone-number">
-                    +1 (555) 123-4567
+                  <a href="tel: +251 96 710 6705" className="phone-number">
+                    +251 96 710 6705
                   </a>
                 </div>
               </InfoBlock>
@@ -571,6 +266,9 @@ const Contact = () => {
                   </SocialBtn>
                   <SocialBtn href="https://facebook.com" label="Facebook">
                     <FacebookIcon />
+                  </SocialBtn>
+                  <SocialBtn href="https://web.telegram.org/" label="Telegram">
+                    <TelegramIcon />
                   </SocialBtn>
                 </div>
               </div>

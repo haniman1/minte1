@@ -13,7 +13,7 @@ const defaultPackages = [
   {
     id: "essential",
     name: "Essential",
-    price: 999,
+    price: 75,
     description:
       "A refined session for intimate portraits, engagements, and smaller moments with lasting value.",
     features: [
@@ -27,7 +27,7 @@ const defaultPackages = [
   {
     id: "signature",
     name: "Signature",
-    price: 2499,
+    price: 80,
     popular: true,
     description:
       "Our recommended package for weddings and full storytelling with elegant, editorial coverage.",
@@ -43,7 +43,7 @@ const defaultPackages = [
   {
     id: "legacy",
     name: "Legacy",
-    price: 4999,
+    price: 99,
     description:
       "A complete luxury experience for multi-day events, destination weddings, and premium coverage.",
     features: [
