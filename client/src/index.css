@@ -1,0 +1,181 @@
+@import url("https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400;1,700&display=swap");
+
+* {
+  box-sizing: border-box;
+}
+
+@import "tailwindcss";
+
+html {
+  scroll-behavior: smooth;
+}
+
+::selection {
+  background: #d4af3740;
+}
+
+/* ── Utility Classes ─────────────────────────────────────────────────── */
+.gold {
+  color: #d4af37;
+}
+
+.gold-border {
+  border-color: #d4af3730;
+}
+
+.serif {
+  font-family: "Playfair Display", Georgia, serif;
+}
+
+/* ── Ticker Animation ─────────────────────────────────────────────────── */
+.ticker-track {
+  display: flex;
+  white-space: nowrap;
+  animation: ticker 28s linear infinite;
+}
+
+@keyframes ticker {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+/* ── Glassmorphism Card ───────────────────────────────────────────────── */
+.glass {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* ── Gold Underline After ─────────────────────────────────────────────── */
+.gold-line::after {
+  content: "";
+  display: block;
+  width: 48px;
+  height: 1px;
+  background: #d4af37;
+  margin-top: 12px;
+}
+
+/* ── Achievement Cards ────────────────────────────────────────────────── */
+.achievement-card {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  transition: all 0.4s ease;
+}
+
+.achievement-card:hover {
+  background: rgba(212, 175, 55, 0.05);
+  border-color: rgba(212, 175, 55, 0.25);
+  transform: translateY(-4px);
+}
+
+/* ── Social Buttons ───────────────────────────────────────────────────── */
+.social-btn {
+  width: 42px;
+  height: 42px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  transition: all 0.3s ease;
+  color: #888;
+  text-decoration: none;
+}
+
+.social-btn:hover {
+  border-color: #d4af37;
+  color: #d4af37;
+  background: rgba(212, 175, 55, 0.08);
+}
+
+/* ── CTA Button (Filled) ──────────────────────────────────────────────── */
+.cta-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 32px;
+  background: #d4af37;
+  color: #000;
+  font-weight: 600;
+  font-size: 13px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+
+.cta-btn:hover {
+  background: #f0c830;
+  gap: 16px;
+}
+
+/* ── Outline Button ───────────────────────────────────────────────────── */
+.outline-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 13px 32px;
+  background: transparent;
+  color: #d4af37;
+  font-weight: 500;
+  font-size: 13px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  border: 1px solid rgba(212, 175, 55, 0.4);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+
+.outline-btn:hover {
+  border-color: #d4af37;
+  background: rgba(212, 175, 55, 0.06);
+  gap: 16px;
+}
+
+/* ── Portrait Frame with Gold Border ─────────────────────────────────── */
+.portrait-frame {
+  position: relative;
+}
+
+.portrait-frame::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  background: linear-gradient(
+    135deg,
+    #d4af37 0%,
+    transparent 50%,
+    #d4af37 100%
+  );
+  z-index: 0;
+  border-radius: 2px;
+}
+
+.portrait-frame > img {
+  position: relative;
+  z-index: 1;
+  display: block;
+}
+
+/* ── Reduced Motion ───────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .ticker-track {
+    animation: none;
+  }
+
+  * {
+    transition: none !important;
+    animation: none !important;
+  }
+}
