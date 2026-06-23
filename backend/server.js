@@ -16,11 +16,9 @@ app.use(express.json());
 connectDB();
 connectCloudinary();
 
+// Root Route
 app.get("/", (req, res) => {
-  res.json({
-    success: true,
-    message: "Photography API is running 🚀",
-  });
+  res.send("🚀 Photography API is running");
 });
 
 // Routes
