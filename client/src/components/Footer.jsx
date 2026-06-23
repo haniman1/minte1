@@ -2,12 +2,11 @@ import { useRef } from "react";
 import { Link } from "react-router-dom";
 import { motion, useInView } from "framer-motion";
 
-const GOLD = "#D4AF37";
-const BORDER = "rgba(255,255,255,0.07)";
-const RAISED = "rgba(255,255,255,0.03)";
-const SURFACE = "#0D0D0D";
-
-const spring = { type: "spring", stiffness: 400, damping: 20 };
+const G = "#D4AF37",
+  B = "rgba(255,255,255,0.07)",
+  R = "rgba(255,255,255,0.03)",
+  S = "#0D0D0D";
+const sp = { type: "spring", stiffness: 400, damping: 20 };
 
 function FadeUp({ children, delay = 0, className = "" }) {
   const ref = useRef(null);
@@ -29,16 +28,22 @@ function SocialBtn({ href, label, children }) {
   return (
     <motion.a
       href={href}
+      target="_blank"
+      rel="noopener noreferrer"
       aria-label={label}
-      whileHover={{ scale: 1.1, y: -2 }}
-      whileTap={{ scale: 0.95 }}
-      transition={spring}
+      title={label}
+      whileHover={{
+        scale: 1.12,
+        y: -4,
+      }}
+      whileTap={{ scale: 0.96 }}
+      transition={sp}
       style={{
         width: 60,
         height: 60,
         borderRadius: "50%",
-        border: `1px solid ${BORDER}`,
-        background: RAISED,
+        border: `1px solid ${B}`,
+        background: R,
         backdropFilter: "blur(12px)",
         WebkitBackdropFilter: "blur(12px)",
         display: "flex",
@@ -47,19 +52,26 @@ function SocialBtn({ href, label, children }) {
         color: "#888",
         textDecoration: "none",
         flexShrink: 0,
-        transition: "border-color 0.3s, color 0.3s, box-shadow 0.3s",
+        cursor: "pointer",
+        position: "relative",
+        overflow: "hidden",
+        transition:
+          "border-color .3s ease,color .3s ease,box-shadow .3s ease,background .3s ease",
       }}
       onMouseEnter={(e) =>
         Object.assign(e.currentTarget.style, {
-          borderColor: GOLD,
-          color: GOLD,
-          boxShadow: "0 0 18px rgba(212,175,55,0.2)",
+          borderColor: G,
+          color: G,
+          background: "rgba(255,255,255,0.08)",
+          boxShadow:
+            "0 0 25px rgba(212,175,55,0.25), inset 0 0 20px rgba(255,255,255,0.04)",
         })
       }
       onMouseLeave={(e) =>
         Object.assign(e.currentTarget.style, {
-          borderColor: BORDER,
+          borderColor: B,
           color: "#888",
+          background: R,
           boxShadow: "none",
         })
       }
@@ -70,23 +82,15 @@ function SocialBtn({ href, label, children }) {
 }
 
 function NavLink({ to, href, children }) {
-  const props = {
-    style: {
-      color: "#666",
-      textDecoration: "none",
-      fontSize: 13,
-      letterSpacing: "0.02em",
-      display: "inline-block",
-      position: "relative",
-      transition: "color 0.3s",
-      paddingBottom: 2,
-    },
-    onMouseEnter: (e) => {
-      e.currentTarget.style.color = "#fff";
-    },
-    onMouseLeave: (e) => {
-      e.currentTarget.style.color = "#666";
-    },
+  const s = {
+    color: "#666",
+    textDecoration: "none",
+    fontSize: 13,
+    letterSpacing: "0.02em",
+    display: "inline-block",
+    position: "relative",
+    transition: "color 0.3s",
+    paddingBottom: 2,
   };
   const inner = (
     <>
@@ -99,18 +103,24 @@ function NavLink({ to, href, children }) {
           left: 0,
           width: "0%",
           height: "1px",
-          background: GOLD,
+          background: G,
           transition: "width 0.35s ease",
         }}
       />
     </>
   );
+
+  const p = {
+    style: s,
+    onMouseEnter: (e) => (e.currentTarget.style.color = "#fff"),
+    onMouseLeave: (e) => (e.currentTarget.style.color = "#666"),
+  };
   return to ? (
-    <Link to={to} {...props}>
+    <Link to={to} {...p}>
       {inner}
     </Link>
   ) : (
-    <a href={href || "#"} {...props}>
+    <a href={href} {...p}>
       {inner}
     </a>
   );
@@ -137,8 +147,8 @@ function CtaButton({ children, variant = "primary", href = "#" }) {
         borderRadius: 0,
         cursor: "pointer",
         transition: "all 0.3s ease",
-        background: p ? GOLD : "transparent",
-        color: p ? "#000" : GOLD,
+        background: p ? G : "transparent",
+        color: p ? "#000" : G,
         border: p ? "none" : "1px solid rgba(212,175,55,0.4)",
         flexShrink: 0,
       }}
@@ -146,13 +156,13 @@ function CtaButton({ children, variant = "primary", href = "#" }) {
         p
           ? (e.currentTarget.style.background = "#F0C830")
           : Object.assign(e.currentTarget.style, {
-              borderColor: GOLD,
+              borderColor: G,
               background: "rgba(212,175,55,0.06)",
             })
       }
       onMouseLeave={(e) =>
         p
-          ? (e.currentTarget.style.background = GOLD)
+          ? (e.currentTarget.style.background = G)
           : Object.assign(e.currentTarget.style, {
               borderColor: "rgba(212,175,55,0.4)",
               background: "transparent",
@@ -182,8 +192,8 @@ function NavCard({ title, items }) {
   return (
     <div
       style={{
-        background: RAISED,
-        border: `1px solid ${BORDER}`,
+        background: R,
+        border: `1px solid ${B}`,
         borderRadius: 16,
         padding: "28px",
       }}
@@ -193,7 +203,7 @@ function NavCard({ title, items }) {
           fontSize: 10,
           letterSpacing: "0.28em",
           textTransform: "uppercase",
-          color: GOLD,
+          color: G,
           marginBottom: 20,
           fontWeight: 500,
         }}
@@ -230,17 +240,9 @@ const Footer = () => (
   <>
     <style>{`
       @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,400&family=Inter:wght@300;400;500;600&display=swap');
-      .nav-link-wrap:hover .nav-underline { width: 100% !important; }
-      @media (max-width: 768px) {
-        .fp { padding: 40px 24px 36px !important; }
-        .fbg { flex-direction: column !important; gap: 32px !important; }
-        .fng { grid-template-columns: 1fr 1fr !important; }
-        .fci { flex-direction: column !important; align-items: flex-start !important; gap: 20px !important; }
-        .fcb { flex-wrap: wrap !important; }
-        .fbt { flex-direction: column !important; text-align: center !important; gap: 8px !important; }
-        .fpi { margin: 0 24px !important; padding: 32px 24px !important; }
-      }
-      @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+      .nav-link-wrap:hover .nav-underline{width:100%!important}
+      @media(max-width:768px){.fp{padding:40px 24px 36px!important}.fbg{flex-direction:column!important;gap:32px!important}.fng{grid-template-columns:1fr 1fr!important}.fci{flex-direction:column!important;align-items:flex-start!important;gap:20px!important}.fcb{flex-wrap:wrap!important}.fbt{flex-direction:column!important;text-align:center!important;gap:8px!important}.fpi{margin:0 24px!important;padding:32px 24px!important}}
+      @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
     `}</style>
 
     <div
@@ -253,18 +255,17 @@ const Footer = () => (
     >
       <footer
         style={{
-          backgroundColor: SURFACE,
+          backgroundColor: S,
           width: "100%",
           maxWidth: 1350,
           margin: "0 auto",
           color: "#fff",
-          fontFamily: "'Inter', sans-serif",
+          fontFamily: "'Inter',sans-serif",
           borderRadius: "24px 24px 0 0",
           overflow: "hidden",
           position: "relative",
         }}
       >
-        {/* Grain overlay */}
         <div
           style={{
             position: "absolute",
@@ -275,7 +276,6 @@ const Footer = () => (
             backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E")`,
           }}
         />
-        {/* Ambient glow */}
         <div
           style={{
             position: "absolute",
@@ -287,7 +287,7 @@ const Footer = () => (
             pointerEvents: "none",
             zIndex: 0,
             background:
-              "radial-gradient(ellipse, rgba(212,175,55,0.06) 0%, transparent 70%)",
+              "radial-gradient(ellipse,rgba(212,175,55,0.06) 0%,transparent 70%)",
           }}
         />
 
@@ -297,7 +297,7 @@ const Footer = () => (
             className="fp"
             style={{
               padding: "56px 48px 48px",
-              borderBottom: `1px solid ${BORDER}`,
+              borderBottom: `1px solid ${B}`,
             }}
           >
             <FadeUp>
@@ -313,7 +313,7 @@ const Footer = () => (
                 <div
                   style={{
                     background: "rgba(255,255,255,0.025)",
-                    border: `1px solid ${BORDER}`,
+                    border: `1px solid ${B}`,
                     backdropFilter: "blur(20px)",
                     WebkitBackdropFilter: "blur(20px)",
                     borderRadius: 20,
@@ -357,7 +357,7 @@ const Footer = () => (
                   </Link>
                   <p
                     style={{
-                      fontFamily: "'Playfair Display', Georgia, serif",
+                      fontFamily: "'Playfair Display',Georgia,serif",
                       fontSize: "clamp(18px,2vw,22px)",
                       fontStyle: "italic",
                       color: "#fff",
@@ -391,13 +391,12 @@ const Footer = () => (
                     }}
                     style={{
                       height: 1,
-                      background: `linear-gradient(to right, ${GOLD}, transparent)`,
+                      background: `linear-gradient(to right,${G},transparent)`,
                       transformOrigin: "left",
                       marginTop: 28,
                     }}
                   />
                 </div>
-
                 <div style={{ paddingTop: 8 }}>
                   <p
                     style={{
@@ -411,22 +410,23 @@ const Footer = () => (
                     Follow the work
                   </p>
                   <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
-                    <SocialBtn href="#" label="Twitter / X">
+                    <SocialBtn
+                      href="https://www.tiktok.com/@yourusername"
+                      label="TikTok"
+                    >
                       <svg
                         width="26"
                         height="26"
                         viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2.5"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
+                        fill="currentColor"
                       >
-                        <path d="M4 4l16 16M4 20L20 4" />
-                        <path d="M20 4h-5l-11 16h5L20 4z" />
+                        <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.77h-3.13v13.17a2.9 2.9 0 1 1-2.9-2.9c.24 0 .47.03.69.08V9.09a6.03 6.03 0 0 0-.69-.04A6.03 6.03 0 1 0 15.82 15V8.34a8.02 8.02 0 0 0 4.69 1.5V6.69h-.92z" />
                       </svg>
                     </SocialBtn>
-                    <SocialBtn href="#" label="Instagram">
+                    <SocialBtn
+                      href="https://www.instagram.com/yourusername"
+                      label="Instagram"
+                    >
                       <svg
                         width="26"
                         height="26"
@@ -454,7 +454,10 @@ const Footer = () => (
                         />
                       </svg>
                     </SocialBtn>
-                    <SocialBtn href="#" label="Facebook">
+                    <SocialBtn
+                      href="https://facebook.com/yourusername"
+                      label="Facebook"
+                    >
                       <svg
                         width="26"
                         height="26"
@@ -468,7 +471,10 @@ const Footer = () => (
                         <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
                       </svg>
                     </SocialBtn>
-                    <SocialBtn href="#" label="Telegram">
+                    <SocialBtn
+                      href="https://web.telegram.org/a/"
+                      label="Telegram"
+                    >
                       <svg
                         width="20"
                         height="20"
@@ -487,14 +493,14 @@ const Footer = () => (
           {/* Nav grid */}
           <div
             className="fp"
-            style={{ padding: "48px", borderBottom: `1px solid ${BORDER}` }}
+            style={{ padding: "48px", borderBottom: `1px solid ${B}` }}
           >
             <FadeUp delay={0.05}>
               <div
                 className="fng"
                 style={{
                   display: "grid",
-                  gridTemplateColumns: "repeat(3, 1fr)",
+                  gridTemplateColumns: "repeat(3,1fr)",
                   gap: "40px 32px",
                 }}
               >
@@ -515,7 +521,7 @@ const Footer = () => (
               style={{
                 margin: "48px 48px 0",
                 background:
-                  "linear-gradient(135deg, rgba(212,175,55,0.06) 0%, rgba(255,255,255,0.02) 50%, rgba(212,175,55,0.04) 100%)",
+                  "linear-gradient(135deg,rgba(212,175,55,0.06) 0%,rgba(255,255,255,0.02) 50%,rgba(212,175,55,0.04) 100%)",
                 border: "1px solid rgba(212,175,55,0.15)",
                 borderRadius: 20,
                 padding: "44px 48px",
@@ -531,7 +537,7 @@ const Footer = () => (
                   width: 200,
                   height: 200,
                   background:
-                    "radial-gradient(circle, rgba(212,175,55,0.12) 0%, transparent 70%)",
+                    "radial-gradient(circle,rgba(212,175,55,0.12) 0%,transparent 70%)",
                   pointerEvents: "none",
                 }}
               />
@@ -551,7 +557,7 @@ const Footer = () => (
                       fontSize: 11,
                       letterSpacing: "0.28em",
                       textTransform: "uppercase",
-                      color: GOLD,
+                      color: G,
                       marginBottom: 12,
                       fontWeight: 500,
                     }}
@@ -560,7 +566,7 @@ const Footer = () => (
                   </p>
                   <h3
                     style={{
-                      fontFamily: "'Playfair Display', Georgia, serif",
+                      fontFamily: "'Playfair Display',Georgia,serif",
                       fontSize: "clamp(22px,3vw,34px)",
                       fontWeight: 700,
                       letterSpacing: "-0.02em",
@@ -592,7 +598,7 @@ const Footer = () => (
                     alignItems: "center",
                   }}
                 >
-                  <CtaButton href="/booking">Book a Session →</CtaButton>
+                  <CtaButton href="/pakege">Book a Session →</CtaButton>
                   <CtaButton href="/gallery" variant="outline">
                     View Gallery →
                   </CtaButton>
@@ -601,71 +607,11 @@ const Footer = () => (
             </div>
           </FadeUp>
 
-          {/* Wordmark */}
-          <div
-            style={{ position: "relative", marginTop: 32, overflow: "hidden" }}
-          >
-            {[
-              {
-                width: "80%",
-                height: "70%",
-                background:
-                  "radial-gradient(ellipse at center bottom, rgba(212,175,55,0.12) 0%, rgba(255,255,255,0.04) 40%, transparent 70%)",
-              },
-              {
-                width: "40%",
-                height: "50%",
-                background:
-                  "radial-gradient(ellipse, rgba(212,175,55,0.18) 0%, transparent 70%)",
-                filter: "blur(30px)",
-              },
-            ].map((s, i) => (
-              <div
-                key={i}
-                style={{
-                  position: "absolute",
-                  bottom: 0,
-                  left: "50%",
-                  transform: "translateX(-50%)",
-                  pointerEvents: "none",
-                  ...s,
-                }}
-              />
-            ))}
-            <FadeUp delay={0.15}>
-              <div
-                style={{
-                  position: "relative",
-                  textAlign: "center",
-                  lineHeight: 1,
-                  userSelect: "none",
-                  paddingBottom: 0,
-                }}
-              >
-                <span
-                  style={{
-                    fontFamily: "'Playfair Display', Georgia, serif",
-                    fontWeight: 900,
-                    fontSize: "clamp(4.5rem,18vw,14rem)",
-                    letterSpacing: "-0.03em",
-                    display: "inline-block",
-                    background: `linear-gradient(to right, ${GOLD} 0%, #fff 40%, #fff 60%, rgba(255,255,255,0.15) 100%)`,
-                    WebkitBackgroundClip: "text",
-                    WebkitTextFillColor: "transparent",
-                    backgroundClip: "text",
-                  }}
-                >
-                  MOMENTS
-                </span>
-              </div>
-            </FadeUp>
-          </div>
-
           {/* Copyright */}
           <div
             className="fp fbt"
             style={{
-              borderTop: `1px solid ${BORDER}`,
+              borderTop: `1px solid ${B}`,
               padding: "20px 48px",
               display: "flex",
               justifyContent: "space-between",

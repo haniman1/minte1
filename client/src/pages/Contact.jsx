@@ -67,19 +67,19 @@ const InstagramIcon = () => (
     <circle cx="17.5" cy="6.5" r="0.5" fill="currentColor" />
   </svg>
 );
-const TwitterIcon = () => (
+const TikTokIcon = () => (
   <svg
-    width="20"
-    height="20"
+    width="26"
+    height="26"
     viewBox="0 0 24 24"
     fill="none"
     stroke="currentColor"
-    strokeWidth="1.8"
+    strokeWidth="2"
     strokeLinecap="round"
     strokeLinejoin="round"
   >
-    <path d="M4 4l16 16M4 20L20 4" />
-    <path d="M20 4h-5L4 20h5L20 4z" />
+    <path d="M14 3v10.5a3.5 3.5 0 1 1-3.5-3.5" />
+    <path d="M14 3c1 2.5 3 4 6 4" />
   </svg>
 );
 const FacebookIcon = () => (
@@ -261,8 +261,8 @@ const Contact = () => {
                   <SocialBtn href="https://instagram.com" label="Instagram">
                     <InstagramIcon />
                   </SocialBtn>
-                  <SocialBtn href="https://twitter.com" label="Twitter / X">
-                    <TwitterIcon />
+                  <SocialBtn href="https://www.tiktok.com/en/" label="Tiktok ">
+                    <TikTokIcon />
                   </SocialBtn>
                   <SocialBtn href="https://facebook.com" label="Facebook">
                     <FacebookIcon />
