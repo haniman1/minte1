@@ -1,8 +1,8 @@
-import express from 'express';
-import cors from 'cors';
-import dotenv from 'dotenv';
-import connectDB from './config/db.js';
-import { connectCloudinary } from './config/cloudinary.js';
+import express from "express";
+import cors from "cors";
+import dotenv from "dotenv";
+import connectDB from "./config/db.js";
+import { connectCloudinary } from "./config/cloudinary.js";
 
 dotenv.config();
 
@@ -16,10 +16,17 @@ app.use(express.json());
 connectDB();
 connectCloudinary();
 
+app.get("/", (req, res) => {
+  res.json({
+    success: true,
+    message: "Photography API is running 🚀",
+  });
+});
+
 // Routes
-app.use('/api/auth', (await import('./routes/authRoutes.js')).default);
-app.use('/api/photos', (await import('./routes/photoRoutes.js')).default);
-app.use('/api/packages', (await import('./routes/packageRoutes.js')).default);
+app.use("/api/auth", (await import("./routes/authRoutes.js")).default);
+app.use("/api/photos", (await import("./routes/photoRoutes.js")).default);
+app.use("/api/packages", (await import("./routes/packageRoutes.js")).default);
 
 const PORT = process.env.PORT || 5000;
 
