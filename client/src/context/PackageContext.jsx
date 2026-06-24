@@ -7,7 +7,7 @@ import {
 } from "react";
 import api from "../services/api";
 
-const PackageContext = createContext();
+const PackageContext = createContext(null);
 
 export const usePackages = () => {
   const context = useContext(PackageContext);
@@ -28,10 +28,9 @@ export const PackageProvider = ({ children }) => {
       const res = await api.get("/packages");
 
       setPackages((prev) => {
-        const oldData = JSON.stringify(prev);
-        const newData = JSON.stringify(res.data);
+        const same = JSON.stringify(prev) === JSON.stringify(res.data);
 
-        return oldData !== newData ? res.data : prev;
+        return same ? prev : res.data;
       });
     } catch (error) {
       console.error("Failed to fetch packages:", error);
