@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "https://minte1-2.onrender.com/api"; // Backend URL
+const API_URL = "http://localhost:5000/api"; // Backend URL
 
 const api = axios.create({
   baseURL: API_URL,
