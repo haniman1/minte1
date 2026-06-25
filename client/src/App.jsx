@@ -32,7 +32,7 @@ const ProtectedRoute = ({ children }) => {
   }
 
   if (!currentUser || !isAdmin()) {
-    return <Navigate to="/admin/login" replace />;
+    return <Navigate to="/login" replace />;
   }
 
   return children;
@@ -56,7 +56,7 @@ function App() {
               <Route path="/about" element={<About />} />
 
               {/* Admin Routes */}
-              <Route path="/admin/login" element={<AdminLogin />} />
+              <Route path="/login" element={<AdminLogin />} />
 
               <Route
                 path="/admin"
