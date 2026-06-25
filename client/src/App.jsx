@@ -54,6 +54,7 @@ function App() {
 
               <Route path="/contact" element={<Contact />} />
               <Route path="/about" element={<About />} />
+              <Route path="/test123" element={<h1>TEST ROUTE</h1>} />
 
               {/* Admin Routes */}
               <Route path="/secret-login-123" element={<AdminLogin />} />
