@@ -1,56 +1,58 @@
-import { useEffect, useMemo, useRef, useState, useCallback } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import api from "../services/api";
-
-/* ─── Google Fonts ──────────────────────────────────────────────────────── */
-const FONT_LINK = `@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=Inter:wght@300;400;500;600&display=swap');`;
+import Button from "../components/Button";
+import { useLanguage } from "../context/LanguageContext";
 
 /* ─── Constants ─────────────────────────────────────────────────────────── */
+const FONT_LINK = `@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=Inter:wght@300;400;500;600&display=swap');`;
+const SERIF = "'Cormorant Garamond', Georgia, serif";
+const SANS = "'Inter', sans-serif";
+const GOLD = "#C9A84C";
+const EASE = "cubic-bezier(0.22,1,0.36,1)";
+
 const heroImage =
   "https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?auto=format&fit=crop&w=2400&q=90";
+
+const u = (id, w = 1200, q = 85) =>
+  `https://images.unsplash.com/${id}?auto=format&fit=crop&w=${w}&q=${q}`;
 
 const fallbackWorks = [
   {
     id: "fallback-1",
     title: "Golden Hour Vows",
     category: "Wedding",
-    image:
-      "https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1200&q=85",
+    image: u("photo-1519741497674-611481863552"),
   },
   {
     id: "fallback-2",
     title: "Editorial Portrait",
     category: "Portrait",
-    image:
-      "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=1200&q=85",
+    image: u("photo-1500648767791-00dcc994a43e"),
   },
   {
     id: "fallback-3",
     title: "Private Celebration",
     category: "Event",
-    image:
-      "https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=1200&q=85",
+    image: u("photo-1511795409834-ef04bbd61622"),
   },
   {
     id: "fallback-4",
     title: "Quiet Ceremony",
     category: "Wedding",
-    image:
-      "https://images.unsplash.com/photo-1523438885200-e635ba2c371e?auto=format&fit=crop&w=1200&q=85",
+    image: u("photo-1523438885200-e635ba2c371e"),
   },
   {
     id: "fallback-5",
     title: "Studio Presence",
     category: "Portrait",
-    image:
-      "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=1200&q=85",
+    image: u("photo-1517841905240-472988babdf9"),
   },
   {
     id: "fallback-6",
     title: "Evening Reception",
     category: "Event",
-    image:
-      "https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?auto=format&fit=crop&w=1200&q=85",
+    image: u("photo-1464366400600-7168b8af9bc3"),
   },
 ];
 
@@ -86,8 +88,7 @@ const testimonials = [
     name: "Maya Chen",
     handle: "@mayachen",
     date: "Feb 2026",
-    image:
-      "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=240&q=80",
+    image: u("photo-1494790108377-be9c29b29330", 240, 80),
     review:
       "Every frame felt intentional. The final gallery was cinematic, emotional, and beautifully edited.",
   },
@@ -95,8 +96,7 @@ const testimonials = [
     name: "Daniel Brooks",
     handle: "@danielbrooks",
     date: "Jan 2026",
-    image:
-      "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=240&q=80",
+    image: u("photo-1500648767791-00dcc994a43e", 240, 80),
     review:
       "Professional, calm, and sharp. The event coverage looked like a premium editorial campaign.",
   },
@@ -104,8 +104,7 @@ const testimonials = [
     name: "Amara Stone",
     handle: "@amarastone",
     date: "Dec 2025",
-    image:
-      "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=240&q=80",
+    image: u("photo-1534528741775-53994a69daeb", 240, 80),
     review:
       "Our wedding photos are timeless. Nothing felt staged, but everything looked elevated.",
   },
@@ -113,8 +112,7 @@ const testimonials = [
     name: "Noah Ellis",
     handle: "@noahellis",
     date: "Nov 2025",
-    image:
-      "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=240&q=80",
+    image: u("photo-1506794778202-cad84cf45f1d", 240, 80),
     review:
       "The portraits had depth, texture, and presence. Exactly the studio quality I wanted.",
   },
@@ -168,7 +166,7 @@ const translations = {
   },
 };
 
-/* ─── Utility: IntersectionObserver hook ───────────────────────────────── */
+/* ─── Hooks ──────────────────────────────────────────────────────────────── */
 function useInView(threshold = 0.15) {
   const ref = useRef(null);
   const [visible, setVisible] = useState(false);
@@ -190,8 +188,8 @@ function useInView(threshold = 0.15) {
   return [ref, visible];
 }
 
-/* ─── Reveal ─────────────────────────────────────────────────────────────── */
-function Reveal({ children, className = "", delay = 0, from = "bottom" }) {
+/* ─── Small shared pieces ────────────────────────────────────────────────── */
+function Reveal({ children, delay = 0, from = "bottom" }) {
   const [ref, visible] = useInView(0.12);
   const transforms = {
     bottom: "translateY(40px)",
@@ -199,15 +197,13 @@ function Reveal({ children, className = "", delay = 0, from = "bottom" }) {
     right: "translateX(32px)",
     scale: "scale(0.94)",
   };
-  const base = transforms[from] || transforms.bottom;
   return (
     <div
       ref={ref}
-      className={className}
       style={{
         opacity: visible ? 1 : 0,
-        transform: visible ? "none" : base,
-        transition: `opacity 0.85s cubic-bezier(0.22,1,0.36,1) ${delay}ms, transform 0.85s cubic-bezier(0.22,1,0.36,1) ${delay}ms`,
+        transform: visible ? "none" : transforms[from] || transforms.bottom,
+        transition: `opacity 0.85s ${EASE} ${delay}ms, transform 0.85s ${EASE} ${delay}ms`,
       }}
     >
       {children}
@@ -215,11 +211,33 @@ function Reveal({ children, className = "", delay = 0, from = "bottom" }) {
   );
 }
 
-/* ─── CountUp ────────────────────────────────────────────────────────────── */
+function Eyebrow({
+  children,
+  spacing = "0.3em",
+  color = "rgba(201,168,76,0.7)",
+  mb = 14,
+}) {
+  return (
+    <p
+      style={{
+        fontFamily: SANS,
+        fontSize: 11,
+        letterSpacing: spacing,
+        textTransform: "uppercase",
+        color,
+        marginBottom: mb,
+      }}
+    >
+      {children}
+    </p>
+  );
+}
+
 function CountUp({ value, suffix = "" }) {
   const ref = useRef(null);
   const [started, setStarted] = useState(false);
   const [count, setCount] = useState(0);
+
   useEffect(() => {
     const node = ref.current;
     if (!node) return;
@@ -235,6 +253,7 @@ function CountUp({ value, suffix = "" }) {
     obs.observe(node);
     return () => obs.disconnect();
   }, []);
+
   useEffect(() => {
     if (!started) return;
     let frame;
@@ -242,13 +261,13 @@ function CountUp({ value, suffix = "" }) {
     const start = performance.now();
     const tick = (now) => {
       const p = Math.min((now - start) / duration, 1);
-      const eased = 1 - Math.pow(1 - p, 4);
-      setCount(Math.floor(eased * value));
+      setCount(Math.floor((1 - Math.pow(1 - p, 4)) * value));
       if (p < 1) frame = requestAnimationFrame(tick);
     };
     frame = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(frame);
   }, [started, value]);
+
   return (
     <span ref={ref}>
       {count}
@@ -258,42 +277,29 @@ function CountUp({ value, suffix = "" }) {
 }
 
 /* ─── Photo helpers ──────────────────────────────────────────────────────── */
-function getPhotoImage(photo) {
-  return (
-    photo.image ||
-    photo.url ||
-    photo.src ||
-    photo.photo ||
-    fallbackWorks[0].image
-  );
-}
-function getPhotoTitle(photo, index) {
-  return (
-    photo.title ||
-    photo.name ||
-    fallbackWorks[index % fallbackWorks.length].title
-  );
-}
-function getPhotoCategory(photo, index) {
-  return (
-    photo.category?.name ||
-    photo.category ||
-    fallbackWorks[index % fallbackWorks.length].category
-  );
-}
+const fb = (i) => fallbackWorks[i % fallbackWorks.length];
+const getPhotoImage = (p) =>
+  p.image || p.url || p.src || p.photo || fallbackWorks[0].image;
+const getPhotoTitle = (p, i) => p.title || p.name || fb(i).title;
+const getPhotoCategory = (p, i) =>
+  p.category?.name || p.category || fb(i).category;
 
 /* ─── WorkCard ───────────────────────────────────────────────────────────── */
+const abs = { position: "absolute" };
+const fill = { ...abs, inset: 0 };
+
 function WorkCard({ photo, index, onClick, viewFullGallery }) {
-  const [hovered, setHovered] = useState(false);
+  const [h, setH] = useState(false);
+  const title = getPhotoTitle(photo, index);
   return (
     <button
       type="button"
       onClick={onClick}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      onFocus={() => setHovered(true)}
-      onBlur={() => setHovered(false)}
-      aria-label={`${getPhotoTitle(photo, index)} — ${viewFullGallery}`}
+      onMouseEnter={() => setH(true)}
+      onMouseLeave={() => setH(false)}
+      onFocus={() => setH(true)}
+      onBlur={() => setH(false)}
+      aria-label={`${title} — ${viewFullGallery}`}
       style={{
         position: "relative",
         height: "30rem",
@@ -302,52 +308,43 @@ function WorkCard({ photo, index, onClick, viewFullGallery }) {
         background: "#111",
         display: "block",
         width: "100%",
-        border: `1px solid ${hovered ? "rgba(201,168,76,0.45)" : "rgba(255,255,255,0.06)"}`,
-        boxShadow: hovered
+        border: `1px solid ${h ? "rgba(201,168,76,0.45)" : "rgba(255,255,255,0.06)"}`,
+        boxShadow: h
           ? "0 0 0 1px rgba(201,168,76,0.2), 0 32px 64px -12px rgba(0,0,0,0.7)"
           : "0 16px 48px -8px rgba(0,0,0,0.5)",
         cursor: "pointer",
         outline: "none",
-        transition:
-          "border-color 0.4s ease, box-shadow 0.4s ease, transform 0.4s cubic-bezier(0.22,1,0.36,1)",
-        transform: hovered ? "translateY(-6px)" : "translateY(0)",
+        transition: `border-color 0.4s ease, box-shadow 0.4s ease, transform 0.4s ${EASE}`,
+        transform: h ? "translateY(-6px)" : "translateY(0)",
       }}
     >
-      {/* Image */}
       <img
         src={getPhotoImage(photo)}
-        alt={getPhotoTitle(photo, index)}
+        alt={title}
         loading="lazy"
         style={{
-          position: "absolute",
-          inset: 0,
+          ...fill,
           width: "100%",
           height: "100%",
           objectFit: "cover",
-          transform: hovered ? "scale(1.08)" : "scale(1.01)",
-          transition: "transform 0.9s cubic-bezier(0.22,1,0.36,1)",
+          transform: h ? "scale(1.08)" : "scale(1.01)",
+          transition: `transform 0.9s ${EASE}`,
           willChange: "transform",
         }}
       />
-
-      {/* Base scrim */}
       <div
         style={{
-          position: "absolute",
-          inset: 0,
+          ...fill,
           background:
             "linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.1) 55%, transparent 100%)",
         }}
       />
-
-      {/* Hover tint */}
       <div
         style={{
-          position: "absolute",
-          inset: 0,
+          ...fill,
           background:
             "linear-gradient(135deg, rgba(201,168,76,0.08) 0%, transparent 60%)",
-          opacity: hovered ? 1 : 0,
+          opacity: h ? 1 : 0,
           transition: "opacity 0.4s ease",
         }}
       />
@@ -355,7 +352,7 @@ function WorkCard({ photo, index, onClick, viewFullGallery }) {
       {/* Category badge */}
       <div
         style={{
-          position: "absolute",
+          ...abs,
           top: 16,
           left: 16,
           padding: "5px 14px",
@@ -369,16 +366,16 @@ function WorkCard({ photo, index, onClick, viewFullGallery }) {
           letterSpacing: "0.2em",
           textTransform: "uppercase",
           color: "rgba(255,255,255,0.85)",
-          fontFamily: "'Inter', sans-serif",
+          fontFamily: SANS,
         }}
       >
         {getPhotoCategory(photo, index)}
       </div>
 
-      {/* Corner accent */}
+      {/* Corner arrow */}
       <div
         style={{
-          position: "absolute",
+          ...abs,
           top: 16,
           right: 16,
           width: 32,
@@ -389,10 +386,9 @@ function WorkCard({ photo, index, onClick, viewFullGallery }) {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          opacity: hovered ? 1 : 0,
-          transform: hovered ? "scale(1)" : "scale(0.6)",
-          transition:
-            "opacity 0.3s ease, transform 0.4s cubic-bezier(0.22,1,0.36,1)",
+          opacity: h ? 1 : 0,
+          transform: h ? "scale(1)" : "scale(0.6)",
+          transition: `opacity 0.3s ease, transform 0.4s ${EASE}`,
         }}
       >
         <svg
@@ -400,32 +396,33 @@ function WorkCard({ photo, index, onClick, viewFullGallery }) {
           height="12"
           viewBox="0 0 24 24"
           fill="none"
-          stroke="#C9A84C"
+          stroke={GOLD}
           strokeWidth="2.5"
           strokeLinecap="round"
           strokeLinejoin="round"
+          aria-hidden="true"
         >
           <path d="M7 17L17 7M17 7H7M17 7v10" />
         </svg>
       </div>
 
-      {/* Info reveal */}
+      {/* Info */}
       <div
         style={{
-          position: "absolute",
+          ...abs,
           bottom: 0,
           left: 0,
           right: 0,
           padding: "28px 24px",
-          transform: hovered ? "translateY(0)" : "translateY(12px)",
-          opacity: hovered ? 1 : 0,
-          transition:
-            "transform 0.45s cubic-bezier(0.22,1,0.36,1), opacity 0.35s ease",
+          textAlign: "left",
+          transform: h ? "translateY(0)" : "translateY(12px)",
+          opacity: h ? 1 : 0,
+          transition: `transform 0.45s ${EASE}, opacity 0.35s ease`,
         }}
       >
         <p
           style={{
-            fontFamily: "'Cormorant Garamond', Georgia, serif",
+            fontFamily: SERIF,
             fontSize: "1.5rem",
             fontWeight: 600,
             color: "#fff",
@@ -434,40 +431,39 @@ function WorkCard({ photo, index, onClick, viewFullGallery }) {
             marginBottom: 6,
           }}
         >
-          {getPhotoTitle(photo, index)}
+          {title}
         </p>
         <p
           style={{
-            fontFamily: "'Inter', sans-serif",
+            fontFamily: SANS,
             fontSize: 11,
             fontWeight: 500,
             letterSpacing: "0.2em",
             textTransform: "uppercase",
-            color: "#C9A84C",
+            color: GOLD,
           }}
         >
           {viewFullGallery} →
         </p>
       </div>
 
-      {/* Bottom gold line */}
+      {/* Gold line */}
       <div
         style={{
-          position: "absolute",
+          ...abs,
           bottom: 0,
           left: 0,
           height: 2,
-          width: hovered ? "100%" : "0%",
-          background:
-            "linear-gradient(to right, #C9A84C, rgba(201,168,76,0.3))",
-          transition: "width 0.55s cubic-bezier(0.22,1,0.36,1)",
+          width: h ? "100%" : "0%",
+          background: `linear-gradient(to right, ${GOLD}, rgba(201,168,76,0.3))`,
+          transition: `width 0.55s ${EASE}`,
         }}
       />
     </button>
   );
 }
 
-/* ─── TestimonialCard ────────────────────────────────────────────────────── */
+/* ─── Testimonials ───────────────────────────────────────────────────────── */
 function TestimonialCard({ testimonial }) {
   return (
     <article
@@ -480,7 +476,7 @@ function TestimonialCard({ testimonial }) {
         background: "rgba(255,255,255,0.035)",
         backdropFilter: "blur(16px)",
         WebkitBackdropFilter: "blur(16px)",
-        padding: "24px",
+        padding: 24,
         boxShadow: "0 8px 32px rgba(0,0,0,0.3)",
       }}
     >
@@ -507,7 +503,7 @@ function TestimonialCard({ testimonial }) {
         <div style={{ flex: 1 }}>
           <p
             style={{
-              fontFamily: "'Inter', sans-serif",
+              fontFamily: SANS,
               fontWeight: 600,
               fontSize: 14,
               color: "#fff",
@@ -516,19 +512,13 @@ function TestimonialCard({ testimonial }) {
           >
             {testimonial.name}
           </p>
-          <p
-            style={{
-              fontFamily: "'Inter', sans-serif",
-              fontSize: 12,
-              color: "#5A5A6A",
-            }}
-          >
+          <p style={{ fontFamily: SANS, fontSize: 12, color: "#5A5A6A" }}>
             {testimonial.handle}
           </p>
         </div>
         <span
           style={{
-            fontFamily: "'Inter', sans-serif",
+            fontFamily: SANS,
             fontSize: 11,
             color: "#5A5A6A",
             letterSpacing: "0.06em",
@@ -538,16 +528,18 @@ function TestimonialCard({ testimonial }) {
         </span>
       </div>
 
-      {/* Stars */}
-      <div style={{ display: "flex", gap: 3, marginBottom: 12 }}>
+      <div
+        style={{ display: "flex", gap: 3, marginBottom: 12 }}
+        aria-label="5 out of 5 stars"
+      >
         {Array.from({ length: 5 }).map((_, i) => (
           <svg
             key={i}
             width="12"
             height="12"
             viewBox="0 0 24 24"
-            fill="#C9A84C"
-            style={{ opacity: i < 5 ? 1 : 0.3 }}
+            fill={GOLD}
+            aria-hidden="true"
           >
             <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
           </svg>
@@ -556,7 +548,7 @@ function TestimonialCard({ testimonial }) {
 
       <p
         style={{
-          fontFamily: "'Inter', sans-serif",
+          fontFamily: SANS,
           fontSize: 13,
           lineHeight: 1.75,
           color: "rgba(255,255,255,0.65)",
@@ -568,11 +560,9 @@ function TestimonialCard({ testimonial }) {
   );
 }
 
-/* ─── TestimonialsMarquee ────────────────────────────────────────────────── */
 function TestimonialsMarquee({ t }) {
   const [paused, setPaused] = useState(false);
-  const firstRow = testimonials;
-  const secondRow = [...testimonials].reverse();
+  const rows = [testimonials, [...testimonials].reverse()];
 
   return (
     <section
@@ -595,21 +585,10 @@ function TestimonialsMarquee({ t }) {
             marginBottom: 48,
           }}
         >
-          <p
-            style={{
-              fontFamily: "'Inter', sans-serif",
-              fontSize: 11,
-              letterSpacing: "0.3em",
-              textTransform: "uppercase",
-              color: "rgba(201,168,76,0.7)",
-              marginBottom: 14,
-            }}
-          >
-            {t.clientNotes}
-          </p>
+          <Eyebrow>{t.clientNotes}</Eyebrow>
           <h2
             style={{
-              fontFamily: "'Cormorant Garamond', Georgia, serif",
+              fontFamily: SERIF,
               fontSize: "clamp(2rem,5vw,3.5rem)",
               fontWeight: 600,
               color: "#fff",
@@ -623,7 +602,7 @@ function TestimonialsMarquee({ t }) {
       </Reveal>
 
       <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-        {[firstRow, secondRow].map((row, ri) => (
+        {rows.map((row, ri) => (
           <div
             key={ri}
             style={{
@@ -646,20 +625,102 @@ function TestimonialsMarquee({ t }) {
       <style>{`
         @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
         @keyframes marqueeRev { from { transform: translateX(-50%); } to { transform: translateX(0); } }
-        @media (prefers-reduced-motion: reduce) { [style*="animation"] { animation: none !important; } }
       `}</style>
     </section>
   );
 }
 
+/* ─── ServiceCard ────────────────────────────────────────────────────────── */
+function ServiceCard({ service }) {
+  const [h, setH] = useState(false);
+  return (
+    <div
+      onMouseEnter={() => setH(true)}
+      onMouseLeave={() => setH(false)}
+      style={{
+        position: "relative",
+        overflow: "hidden",
+        borderRadius: "1.5rem",
+        border: `1px solid ${h ? "rgba(201,168,76,0.3)" : "rgba(255,255,255,0.07)"}`,
+        background: h ? "rgba(201,168,76,0.04)" : "rgba(255,255,255,0.03)",
+        padding: "40px 36px 36px",
+        transition: `border-color 0.4s ease, background 0.4s ease, transform 0.4s ${EASE}, box-shadow 0.4s ease`,
+        transform: h ? "translateY(-6px)" : "translateY(0)",
+        boxShadow: h ? "0 24px 56px -8px rgba(0,0,0,0.5)" : "none",
+      }}
+    >
+      <div
+        aria-hidden="true"
+        style={{
+          ...abs,
+          top: -12,
+          right: 20,
+          fontFamily: SERIF,
+          fontSize: "7rem",
+          fontWeight: 700,
+          color: h ? "rgba(201,168,76,0.08)" : "rgba(255,255,255,0.04)",
+          lineHeight: 1,
+          userSelect: "none",
+          pointerEvents: "none",
+          transition: "color 0.4s ease",
+          letterSpacing: "-0.04em",
+        }}
+      >
+        {service.num}
+      </div>
+
+      <div
+        style={{
+          width: h ? 48 : 24,
+          height: 2,
+          background: GOLD,
+          marginBottom: 32,
+          transition: `width 0.4s ${EASE}`,
+        }}
+      />
+
+      <h3
+        style={{
+          fontFamily: SERIF,
+          fontSize: "1.75rem",
+          fontWeight: 600,
+          color: "#fff",
+          letterSpacing: "-0.02em",
+          lineHeight: 1.15,
+          marginBottom: 16,
+        }}
+      >
+        {service.title}
+      </h3>
+      <p
+        style={{
+          fontFamily: SANS,
+          fontSize: 13,
+          lineHeight: 1.8,
+          color: "rgba(255,255,255,0.45)",
+          fontWeight: 300,
+        }}
+      >
+        {service.description}
+      </p>
+    </div>
+  );
+}
+
 /* ─── Home ───────────────────────────────────────────────────────────────── */
+const grid = (min) => ({
+  display: "grid",
+  gap: 20,
+  gridTemplateColumns: `repeat(auto-fill, minmax(min(100%, ${min}px), 1fr))`,
+});
+
 const Home = () => {
   const navigate = useNavigate();
-  const [lang, setLang] = useState("en");
+  const { lang } = useLanguage(); // shared with the sidebar toggle
+  const t = translations[lang] ?? translations.en;
   const [photos, setPhotos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [heroLoaded, setHeroLoaded] = useState(false);
-  const t = translations[lang];
 
   useEffect(() => {
     document.documentElement.style.scrollBehavior = "smooth";
@@ -669,23 +730,43 @@ const Home = () => {
   }, []);
 
   useEffect(() => {
-    const fetchPhotos = async () => {
+    let cancelled = false;
+    (async () => {
       try {
         const res = await api.get("/photos");
-        setPhotos(Array.isArray(res.data) ? res.data : []);
+        if (!cancelled) setPhotos(Array.isArray(res.data) ? res.data : []);
       } catch (err) {
         console.error("Failed to load photos", err);
       } finally {
-        setLoading(false);
+        if (!cancelled) setLoading(false);
       }
+    })();
+    return () => {
+      cancelled = true;
     };
-    fetchPhotos();
   }, []);
 
   const selectedWorks = useMemo(() => {
     const featured = photos.slice(0, 6);
     return featured.length > 0 ? featured : fallbackWorks;
   }, [photos]);
+
+  const fade = (delay, dur = 0.9) => ({
+    animation: `fadeUp ${dur}s ease forwards`,
+    opacity: 0,
+    animationDelay: `${delay}s`,
+  });
+  const rule = (dir) => ({
+    flex: 1,
+    maxWidth: 80,
+    height: 1,
+    background: `linear-gradient(to ${dir}, transparent, rgba(201,168,76,0.6))`,
+  });
+  const titleLine = (size, extra) => ({
+    display: "block",
+    fontSize: size,
+    ...extra,
+  });
 
   return (
     <div
@@ -698,19 +779,16 @@ const Home = () => {
     >
       <style>{`
         ${FONT_LINK}
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-        body { background: #000; }
         @keyframes heroZoom { from { transform: scale(1.04); } to { transform: scale(1.12); } }
         @keyframes breathe { 0%,100% { opacity: 0.35; transform: scale(1); } 50% { opacity: 0.55; transform: scale(1.08); } }
         @keyframes fadeUp { from { opacity:0; transform:translateY(24px); } to { opacity:1; transform:translateY(0); } }
         @keyframes lineGrow { from { transform: scaleX(0); } to { transform: scaleX(1); } }
-        @keyframes spin { to { transform: rotate(360deg); } }
         @media (prefers-reduced-motion: reduce) {
-          *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+          *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
         }
       `}</style>
 
-      {/* ── HERO ───────────────────────────────────────────────────────── */}
+      {/* ── HERO ─────────────────────────────────────────────────────── */}
       <section
         style={{
           position: "relative",
@@ -721,11 +799,9 @@ const Home = () => {
           overflow: "hidden",
         }}
       >
-        {/* Hero image */}
         <div
           style={{
-            position: "absolute",
-            inset: 0,
+            ...fill,
             animation: heroLoaded
               ? "heroZoom 20s ease-in-out infinite alternate"
               : "none",
@@ -744,28 +820,26 @@ const Home = () => {
           />
         </div>
 
-        {/* Layered overlays */}
         <div
           style={{
-            position: "absolute",
-            inset: 0,
+            ...fill,
             background:
               "linear-gradient(to bottom, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.55) 50%, rgba(0,0,0,0.96) 100%)",
           }}
         />
         <div
           style={{
-            position: "absolute",
-            inset: 0,
+            ...fill,
             background:
               "radial-gradient(ellipse 80% 60% at 50% 0%, rgba(201,168,76,0.07) 0%, transparent 70%)",
           }}
         />
 
-        {/* Ambient light orb — signature element */}
+        {/* Ambient light orb */}
         <div
+          aria-hidden="true"
           style={{
-            position: "absolute",
+            ...abs,
             top: "20%",
             left: "50%",
             transform: "translateX(-50%)",
@@ -780,41 +854,6 @@ const Home = () => {
           }}
         />
 
-        {/* Lang toggle */}
-        <button
-          onClick={() => setLang(lang === "en" ? "am" : "en")}
-          style={{
-            position: "absolute",
-            top: 24,
-            right: 24,
-            zIndex: 20,
-            padding: "8px 18px",
-            borderRadius: 999,
-            border: "1px solid rgba(255,255,255,0.15)",
-            background: "rgba(0,0,0,0.45)",
-            backdropFilter: "blur(12px)",
-            WebkitBackdropFilter: "blur(12px)",
-            color: "rgba(255,255,255,0.75)",
-            fontSize: 12,
-            fontFamily: "'Inter', sans-serif",
-            fontWeight: 500,
-            letterSpacing: "0.08em",
-            cursor: "pointer",
-            transition: "background 0.3s, border-color 0.3s",
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.background = "rgba(0,0,0,0.7)";
-            e.currentTarget.style.borderColor = "rgba(201,168,76,0.4)";
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.background = "rgba(0,0,0,0.45)";
-            e.currentTarget.style.borderColor = "rgba(255,255,255,0.15)";
-          }}
-        >
-          EN / አማ
-        </button>
-
-        {/* Hero content */}
         <div
           style={{
             position: "relative",
@@ -828,9 +867,7 @@ const Home = () => {
           {/* Eyebrow */}
           <div
             style={{
-              animation: "fadeUp 0.8s ease forwards",
-              opacity: 0,
-              animationDelay: "0.2s",
+              ...fade(0.2, 0.8),
               marginBottom: 32,
               display: "flex",
               alignItems: "center",
@@ -838,18 +875,10 @@ const Home = () => {
               gap: 16,
             }}
           >
-            <div
-              style={{
-                flex: 1,
-                maxWidth: 80,
-                height: 1,
-                background:
-                  "linear-gradient(to right, transparent, rgba(201,168,76,0.6))",
-              }}
-            />
+            <div style={rule("right")} />
             <p
               style={{
-                fontFamily: "'Inter', sans-serif",
+                fontFamily: SANS,
                 fontSize: 11,
                 letterSpacing: "0.35em",
                 textTransform: "uppercase",
@@ -858,73 +887,52 @@ const Home = () => {
             >
               {t.heroPill}
             </p>
-            <div
-              style={{
-                flex: 1,
-                maxWidth: 80,
-                height: 1,
-                background:
-                  "linear-gradient(to left, transparent, rgba(201,168,76,0.6))",
-              }}
-            />
+            <div style={rule("left")} />
           </div>
 
-          {/* Title — editorial split */}
-          <div
-            style={{
-              animation: "fadeUp 0.9s ease forwards",
-              opacity: 0,
-              animationDelay: "0.4s",
-              marginBottom: 28,
-            }}
-          >
+          {/* Title */}
+          <div style={{ ...fade(0.4), marginBottom: 28 }}>
             <h1
               style={{
-                fontFamily: "'Cormorant Garamond', Georgia, serif",
+                fontFamily: SERIF,
                 lineHeight: 0.92,
                 letterSpacing: "-0.04em",
               }}
             >
               <span
-                style={{
-                  display: "block",
-                  fontSize: "clamp(3.8rem, 12vw, 9rem)",
+                style={titleLine("clamp(3.8rem, 12vw, 9rem)", {
                   fontWeight: 300,
                   fontStyle: "italic",
                   color: "rgba(255,255,255,0.92)",
-                }}
+                })}
               >
                 {t.heroTitle1}
               </span>
               <span
-                style={{
-                  display: "block",
-                  fontSize: "clamp(4.5rem, 14vw, 11rem)",
+                style={titleLine("clamp(4.5rem, 14vw, 11rem)", {
                   fontWeight: 700,
                   color: "#fff",
                   letterSpacing: "-0.05em",
-                }}
+                })}
               >
                 {t.heroTitle2}
               </span>
               <span
-                style={{
-                  display: "block",
-                  fontSize: "clamp(3.8rem, 12vw, 9rem)",
+                style={titleLine("clamp(3.8rem, 12vw, 9rem)", {
                   fontWeight: 300,
                   fontStyle: "italic",
                   color: "rgba(201,168,76,0.85)",
-                }}
+                })}
               >
                 {t.heroTitle3}
               </span>
             </h1>
           </div>
 
-          {/* Divider line */}
+          {/* Divider */}
           <div
             style={{
-              animation: "lineGrow 0.8s cubic-bezier(0.22,1,0.36,1) forwards",
+              animation: `lineGrow 0.8s ${EASE} forwards`,
               opacity: 0,
               animationDelay: "0.7s",
               transformOrigin: "center",
@@ -938,17 +946,10 @@ const Home = () => {
           />
 
           {/* Description */}
-          <div
-            style={{
-              animation: "fadeUp 0.9s ease forwards",
-              opacity: 0,
-              animationDelay: "0.75s",
-              marginBottom: 40,
-            }}
-          >
+          <div style={{ ...fade(0.75), marginBottom: 40 }}>
             <p
               style={{
-                fontFamily: "'Inter', sans-serif",
+                fontFamily: SANS,
                 fontSize: "clamp(0.9rem, 2vw, 1.1rem)",
                 lineHeight: 1.8,
                 color: "rgba(255,255,255,0.55)",
@@ -961,31 +962,29 @@ const Home = () => {
             </p>
           </div>
 
-          {/* CTAs */}
+          {/* CTAs — shared Button component */}
           <div
             style={{
-              animation: "fadeUp 0.9s ease forwards",
-              opacity: 0,
-              animationDelay: "0.95s",
+              ...fade(0.95),
               display: "flex",
               gap: 12,
               justifyContent: "center",
               flexWrap: "wrap",
             }}
           >
-            <HeroButton to="/gallery" variant="primary">
+            <Button to="/gallery" size="lg">
               {t.viewGallery}
-            </HeroButton>
-            <HeroButton to="/contact" variant="outline">
+            </Button>
+            <Button to="/contact" size="lg" variant="outline">
               {t.bookSession}
-            </HeroButton>
+            </Button>
           </div>
         </div>
 
         {/* Scroll indicator */}
         <div
           style={{
-            position: "absolute",
+            ...abs,
             bottom: 32,
             left: "50%",
             transform: "translateX(-50%)",
@@ -1008,7 +1007,7 @@ const Home = () => {
           />
           <p
             style={{
-              fontFamily: "'Inter', sans-serif",
+              fontFamily: SANS,
               fontSize: 9,
               letterSpacing: "0.3em",
               textTransform: "uppercase",
@@ -1020,7 +1019,7 @@ const Home = () => {
         </div>
       </section>
 
-      {/* ── PORTFOLIO ──────────────────────────────────────────────────── */}
+      {/* ── PORTFOLIO ────────────────────────────────────────────────── */}
       <section
         style={{ maxWidth: 1280, margin: "0 auto", padding: "96px 24px" }}
       >
@@ -1028,96 +1027,58 @@ const Home = () => {
           <div
             style={{
               display: "flex",
-              flexDirection: "column",
-              gap: 20,
+              alignItems: "flex-end",
+              gap: 16,
               marginBottom: 52,
-              alignItems: "flex-start",
             }}
           >
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 16,
-                width: "100%",
-              }}
-            >
-              <div>
-                <p
-                  style={{
-                    fontFamily: "'Inter', sans-serif",
-                    fontSize: 11,
-                    letterSpacing: "0.3em",
-                    textTransform: "uppercase",
-                    color: "rgba(201,168,76,0.7)",
-                    marginBottom: 12,
-                  }}
-                >
-                  {t.portfolioLabel}
-                </p>
-                <h2
-                  style={{
-                    fontFamily: "'Cormorant Garamond', Georgia, serif",
-                    fontSize: "clamp(2.5rem, 6vw, 5rem)",
-                    fontWeight: 600,
-                    letterSpacing: "-0.03em",
-                    lineHeight: 1.0,
-                    color: "#fff",
-                  }}
-                >
-                  {t.portfolio}
-                </h2>
-              </div>
-              <div
+            <div>
+              <Eyebrow mb={12}>{t.portfolioLabel}</Eyebrow>
+              <h2
                 style={{
-                  flex: 1,
-                  height: 1,
-                  background: "rgba(255,255,255,0.06)",
-                  marginLeft: 24,
-                  display: "none",
-                }}
-                className="hidden md:block"
-              />
-              <Link
-                to="/gallery"
-                style={{
-                  marginLeft: "auto",
-                  fontFamily: "'Inter', sans-serif",
-                  fontSize: 11,
-                  letterSpacing: "0.22em",
-                  textTransform: "uppercase",
-                  color: "rgba(255,255,255,0.4)",
-                  textDecoration: "none",
-                  borderBottom: "1px solid rgba(255,255,255,0.15)",
-                  paddingBottom: 2,
-                  whiteSpace: "nowrap",
-                  transition: "color 0.3s, border-color 0.3s",
-                  flexShrink: 0,
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.color = "#C9A84C";
-                  e.currentTarget.style.borderColor = "#C9A84C";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.color = "rgba(255,255,255,0.4)";
-                  e.currentTarget.style.borderColor = "rgba(255,255,255,0.15)";
+                  fontFamily: SERIF,
+                  fontSize: "clamp(2.5rem, 6vw, 5rem)",
+                  fontWeight: 600,
+                  letterSpacing: "-0.03em",
+                  lineHeight: 1,
+                  color: "#fff",
                 }}
               >
-                {t.viewAll} →
-              </Link>
+                {t.portfolio}
+              </h2>
             </div>
+            <Link
+              to="/gallery"
+              style={{
+                marginLeft: "auto",
+                fontFamily: SANS,
+                fontSize: 11,
+                letterSpacing: "0.22em",
+                textTransform: "uppercase",
+                color: "rgba(255,255,255,0.4)",
+                textDecoration: "none",
+                borderBottom: "1px solid rgba(255,255,255,0.15)",
+                paddingBottom: 2,
+                whiteSpace: "nowrap",
+                transition: "color 0.3s, border-color 0.3s",
+                flexShrink: 0,
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.color = GOLD;
+                e.currentTarget.style.borderColor = GOLD;
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.color = "rgba(255,255,255,0.4)";
+                e.currentTarget.style.borderColor = "rgba(255,255,255,0.15)";
+              }}
+            >
+              {t.viewAll} →
+            </Link>
           </div>
         </Reveal>
 
         {loading ? (
-          <div
-            style={{
-              display: "grid",
-              gap: 20,
-              gridTemplateColumns:
-                "repeat(auto-fill, minmax(min(100%, 360px), 1fr))",
-            }}
-          >
+          <div style={grid(360)} aria-busy="true">
             {Array.from({ length: 6 }).map((_, i) => (
               <div
                 key={i}
@@ -1132,14 +1093,7 @@ const Home = () => {
             ))}
           </div>
         ) : (
-          <div
-            style={{
-              display: "grid",
-              gap: 20,
-              gridTemplateColumns:
-                "repeat(auto-fill, minmax(min(100%, 360px), 1fr))",
-            }}
-          >
+          <div style={grid(360)}>
             {selectedWorks.map((photo, index) => (
               <Reveal key={photo._id || photo.id || index} delay={index * 60}>
                 <WorkCard
@@ -1154,7 +1108,7 @@ const Home = () => {
         )}
       </section>
 
-      {/* ── SERVICES ───────────────────────────────────────────────────── */}
+      {/* ── SERVICES ─────────────────────────────────────────────────── */}
       <section
         style={{
           background: "#050505",
@@ -1166,21 +1120,10 @@ const Home = () => {
         <div style={{ maxWidth: 1280, margin: "0 auto" }}>
           <Reveal>
             <div style={{ marginBottom: 56, maxWidth: 640 }}>
-              <p
-                style={{
-                  fontFamily: "'Inter', sans-serif",
-                  fontSize: 11,
-                  letterSpacing: "0.3em",
-                  textTransform: "uppercase",
-                  color: "rgba(201,168,76,0.7)",
-                  marginBottom: 14,
-                }}
-              >
-                {t.servicesLabel}
-              </p>
+              <Eyebrow>{t.servicesLabel}</Eyebrow>
               <h2
                 style={{
-                  fontFamily: "'Cormorant Garamond', Georgia, serif",
+                  fontFamily: SERIF,
                   fontSize: "clamp(2rem, 4.5vw, 3.5rem)",
                   fontWeight: 400,
                   fontStyle: "italic",
@@ -1194,14 +1137,7 @@ const Home = () => {
             </div>
           </Reveal>
 
-          <div
-            style={{
-              display: "grid",
-              gap: 16,
-              gridTemplateColumns:
-                "repeat(auto-fill, minmax(min(100%, 300px), 1fr))",
-            }}
-          >
+          <div style={{ ...grid(300), gap: 16 }}>
             {services.map((service, index) => (
               <Reveal key={service.title} delay={index * 100}>
                 <ServiceCard service={service} />
@@ -1211,7 +1147,7 @@ const Home = () => {
         </div>
       </section>
 
-      {/* ── STATS ──────────────────────────────────────────────────────── */}
+      {/* ── STATS ────────────────────────────────────────────────────── */}
       <section style={{ padding: "80px 24px" }}>
         <div style={{ maxWidth: 1000, margin: "0 auto" }}>
           <Reveal>
@@ -1244,19 +1180,18 @@ const Home = () => {
                 >
                   <div
                     style={{
-                      position: "absolute",
+                      ...abs,
                       top: 0,
                       left: "50%",
                       transform: "translateX(-50%)",
                       width: 40,
                       height: 2,
-                      background:
-                        "linear-gradient(to right, transparent, #C9A84C, transparent)",
+                      background: `linear-gradient(to right, transparent, ${GOLD}, transparent)`,
                     }}
                   />
                   <p
                     style={{
-                      fontFamily: "'Cormorant Garamond', Georgia, serif",
+                      fontFamily: SERIF,
                       fontSize: "clamp(3rem, 6vw, 5rem)",
                       fontWeight: 700,
                       color: "#fff",
@@ -1269,7 +1204,7 @@ const Home = () => {
                   </p>
                   <p
                     style={{
-                      fontFamily: "'Inter', sans-serif",
+                      fontFamily: SANS,
                       fontSize: 11,
                       letterSpacing: "0.22em",
                       textTransform: "uppercase",
@@ -1286,10 +1221,10 @@ const Home = () => {
         </div>
       </section>
 
-      {/* ── TESTIMONIALS ───────────────────────────────────────────────── */}
+      {/* ── TESTIMONIALS ─────────────────────────────────────────────── */}
       <TestimonialsMarquee t={t} />
 
-      {/* ── CTA ────────────────────────────────────────────────────────── */}
+      {/* ── CTA ──────────────────────────────────────────────────────── */}
       <section style={{ padding: "96px 24px" }}>
         <Reveal>
           <div
@@ -1307,10 +1242,10 @@ const Home = () => {
               boxShadow: "0 40px 100px -20px rgba(0,0,0,0.7)",
             }}
           >
-            {/* Decorative glow */}
             <div
+              aria-hidden="true"
               style={{
-                position: "absolute",
+                ...abs,
                 top: -100,
                 left: "50%",
                 transform: "translateX(-50%)",
@@ -1324,8 +1259,9 @@ const Home = () => {
               }}
             />
             <div
+              aria-hidden="true"
               style={{
-                position: "absolute",
+                ...abs,
                 bottom: -60,
                 right: -60,
                 width: 240,
@@ -1339,27 +1275,17 @@ const Home = () => {
             />
 
             <div style={{ position: "relative" }}>
-              <p
-                style={{
-                  fontFamily: "'Inter', sans-serif",
-                  fontSize: 11,
-                  letterSpacing: "0.35em",
-                  textTransform: "uppercase",
-                  color: "rgba(201,168,76,0.75)",
-                  marginBottom: 20,
-                }}
-              >
+              <Eyebrow spacing="0.35em" color="rgba(201,168,76,0.75)" mb={20}>
                 {t.bookStudioLabel}
-              </p>
+              </Eyebrow>
               <h2
                 style={{
-                  fontFamily: "'Cormorant Garamond', Georgia, serif",
+                  fontFamily: SERIF,
                   fontSize: "clamp(2.5rem, 6vw, 5.5rem)",
                   fontWeight: 600,
                   letterSpacing: "-0.04em",
                   color: "#fff",
-                  lineHeight: 1.0,
-                  marginBottom: 20,
+                  lineHeight: 1,
                   maxWidth: 760,
                   margin: "0 auto 20px",
                 }}
@@ -1368,7 +1294,7 @@ const Home = () => {
               </h2>
               <p
                 style={{
-                  fontFamily: "'Inter', sans-serif",
+                  fontFamily: SANS,
                   fontSize: "clamp(0.85rem, 1.8vw, 1rem)",
                   lineHeight: 1.85,
                   color: "rgba(255,255,255,0.4)",
@@ -1387,9 +1313,9 @@ const Home = () => {
                   gap: 10,
                   padding: "14px 36px",
                   borderRadius: 999,
-                  background: "#C9A84C",
+                  background: GOLD,
                   color: "#000",
-                  fontFamily: "'Inter', sans-serif",
+                  fontFamily: SANS,
                   fontSize: 12,
                   fontWeight: 700,
                   letterSpacing: "0.18em",
@@ -1406,7 +1332,7 @@ const Home = () => {
                   e.currentTarget.style.transform = "translateY(-2px)";
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.background = "#C9A84C";
+                  e.currentTarget.style.background = GOLD;
                   e.currentTarget.style.boxShadow =
                     "0 0 40px rgba(201,168,76,0.3)";
                   e.currentTarget.style.transform = "translateY(0)";
@@ -1422,6 +1348,7 @@ const Home = () => {
                   strokeWidth="2.5"
                   strokeLinecap="round"
                   strokeLinejoin="round"
+                  aria-hidden="true"
                 >
                   <path d="M5 12h14M12 5l7 7-7 7" />
                 </svg>
@@ -1433,131 +1360,5 @@ const Home = () => {
     </div>
   );
 };
-
-/* ─── HeroButton ─────────────────────────────────────────────────────────── */
-function HeroButton({ to, variant, children }) {
-  const isPrimary = variant === "primary";
-  return (
-    <Link
-      to={to}
-      style={{
-        display: "inline-flex",
-        alignItems: "center",
-        gap: 8,
-        padding: "14px 32px",
-        borderRadius: 999,
-        background: isPrimary ? "#fff" : "rgba(255,255,255,0.08)",
-        color: isPrimary ? "#000" : "#fff",
-        border: isPrimary ? "none" : "1px solid rgba(255,255,255,0.18)",
-        backdropFilter: isPrimary ? "none" : "blur(12px)",
-        WebkitBackdropFilter: isPrimary ? "none" : "blur(12px)",
-        fontFamily: "'Inter', sans-serif",
-        fontSize: 12,
-        fontWeight: 700,
-        letterSpacing: "0.18em",
-        textTransform: "uppercase",
-        textDecoration: "none",
-        transition: "background 0.3s, transform 0.3s, box-shadow 0.3s",
-      }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.background = isPrimary
-          ? "#F0EBE0"
-          : "rgba(255,255,255,0.14)";
-        e.currentTarget.style.transform = "translateY(-2px)";
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.background = isPrimary
-          ? "#fff"
-          : "rgba(255,255,255,0.08)";
-        e.currentTarget.style.transform = "translateY(0)";
-      }}
-    >
-      {children}
-    </Link>
-  );
-}
-
-/* ─── ServiceCard ────────────────────────────────────────────────────────── */
-function ServiceCard({ service }) {
-  const [hovered, setHovered] = useState(false);
-  return (
-    <div
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      style={{
-        position: "relative",
-        overflow: "hidden",
-        borderRadius: "1.5rem",
-        border: `1px solid ${hovered ? "rgba(201,168,76,0.3)" : "rgba(255,255,255,0.07)"}`,
-        background: hovered
-          ? "rgba(201,168,76,0.04)"
-          : "rgba(255,255,255,0.03)",
-        padding: "40px 36px 36px",
-        transition:
-          "border-color 0.4s ease, background 0.4s ease, transform 0.4s cubic-bezier(0.22,1,0.36,1), box-shadow 0.4s ease",
-        transform: hovered ? "translateY(-6px)" : "translateY(0)",
-        boxShadow: hovered ? "0 24px 56px -8px rgba(0,0,0,0.5)" : "none",
-        cursor: "default",
-      }}
-    >
-      {/* Watermark number */}
-      <div
-        style={{
-          position: "absolute",
-          top: -12,
-          right: 20,
-          fontFamily: "'Cormorant Garamond', Georgia, serif",
-          fontSize: "7rem",
-          fontWeight: 700,
-          color: hovered ? "rgba(201,168,76,0.08)" : "rgba(255,255,255,0.04)",
-          lineHeight: 1,
-          userSelect: "none",
-          pointerEvents: "none",
-          transition: "color 0.4s ease",
-          letterSpacing: "-0.04em",
-        }}
-      >
-        {service.num}
-      </div>
-
-      {/* Top gold accent */}
-      <div
-        style={{
-          width: hovered ? 48 : 24,
-          height: 2,
-          background: "#C9A84C",
-          marginBottom: 32,
-          transition: "width 0.4s cubic-bezier(0.22,1,0.36,1)",
-        }}
-      />
-
-      <h3
-        style={{
-          fontFamily: "'Cormorant Garamond', Georgia, serif",
-          fontSize: "1.75rem",
-          fontWeight: 600,
-          color: "#fff",
-          letterSpacing: "-0.02em",
-          lineHeight: 1.15,
-          marginBottom: 16,
-        }}
-      >
-        {service.title}
-      </h3>
-
-      <p
-        style={{
-          fontFamily: "'Inter', sans-serif",
-          fontSize: 13,
-          lineHeight: 1.8,
-          color: "rgba(255,255,255,0.45)",
-          fontWeight: 300,
-        }}
-      >
-        {service.description}
-      </p>
-    </div>
-  );
-}
 
 export default Home;

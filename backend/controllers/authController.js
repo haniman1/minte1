@@ -1,6 +1,6 @@
-import User from '../models/User.js';
-import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
+import User from "../models/User.js";
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
 
 export const login = async (req, res) => {
   try {
@@ -19,7 +19,7 @@ export const login = async (req, res) => {
     const token = jwt.sign(
       { id: user._id, role: user.role },
       process.env.JWT_SECRET,
-      { expiresIn: '7d' }
+      { expiresIn: "7d" },
     );
 
     res.json({
@@ -29,31 +29,44 @@ export const login = async (req, res) => {
         id: user._id,
         name: user.name,
         email: user.email,
-        role: user.role
-      }
+        role: user.role,
+      },
     });
   } catch (error) {
     res.status(500).json({ message: "Server error" });
   }
 };
 
-// Seed Admin (Run once)
-export const seedAdmin = async () => {
+export const seedAdmin = async (req, res) => {
   try {
-    const adminExists = await User.findOne({ email: 'admin@photo.com' });
-    if (adminExists) return;
+    const email = (process.env.ADMIN_EMAIL || "").toLowerCase();
+    const password = process.env.ADMIN_PASSWORD;
 
-    const hashedPassword = await bcrypt.hash('admin123', 10);
+    if (!email || !password) {
+      return res
+        ?.status(400)
+        .json({ message: "Set ADMIN_EMAIL and ADMIN_PASSWORD in .env" });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const existing = await User.findOne({ email });
+
+    if (existing) {
+      existing.password = hashedPassword;
+      existing.role = "admin";
+      await existing.save();
+      return res?.json({ message: "Admin updated" });
+    }
 
     await User.create({
       name: "Admin",
-      email: "admin@photo.com",
+      email,
       password: hashedPassword,
-      role: "admin"
+      role: "admin",
     });
-
-    console.log('✅ Admin user seeded successfully');
+    res?.json({ message: "Admin created" });
   } catch (error) {
-    console.error('Error seeding admin:', error);
+    console.error("Error seeding admin:", error);
+    res?.status(500).json({ message: error.message });
   }
 };

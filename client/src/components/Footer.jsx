@@ -7,6 +7,7 @@ const G = "#D4AF37",
   R = "rgba(255,255,255,0.03)",
   S = "#0D0D0D";
 const sp = { type: "spring", stiffness: 400, damping: 20 };
+const YEAR = new Date().getFullYear();
 
 function FadeUp({ children, delay = 0, className = "" }) {
   const ref = useRef(null);
@@ -83,7 +84,7 @@ function SocialBtn({ href, label, children }) {
 
 function NavLink({ to, href, children }) {
   const s = {
-    color: "#666",
+    color: "#8a8a8a",
     textDecoration: "none",
     fontSize: 13,
     letterSpacing: "0.02em",
@@ -113,7 +114,7 @@ function NavLink({ to, href, children }) {
   const p = {
     style: s,
     onMouseEnter: (e) => (e.currentTarget.style.color = "#fff"),
-    onMouseLeave: (e) => (e.currentTarget.style.color = "#666"),
+    onMouseLeave: (e) => (e.currentTarget.style.color = "#8a8a8a"),
   };
   return to ? (
     <Link to={to} {...p}>
@@ -126,51 +127,55 @@ function NavLink({ to, href, children }) {
   );
 }
 
-function CtaButton({ children, variant = "primary", href = "#" }) {
+// Internal links use <Link> so navigation doesn't reload the page
+function CtaButton({ children, variant = "primary", to = "/" }) {
   const p = variant === "primary";
   return (
-    <motion.a
-      href={href}
+    <motion.div
       whileHover={{ y: -2 }}
       whileTap={{ scale: 0.97 }}
       transition={{ type: "spring", stiffness: 400, damping: 25 }}
-      style={{
-        display: "inline-flex",
-        alignItems: "center",
-        gap: 10,
-        padding: "13px 28px",
-        fontSize: 12,
-        fontWeight: 600,
-        letterSpacing: "0.14em",
-        textTransform: "uppercase",
-        textDecoration: "none",
-        borderRadius: 0,
-        cursor: "pointer",
-        transition: "all 0.3s ease",
-        background: p ? G : "transparent",
-        color: p ? "#000" : G,
-        border: p ? "none" : "1px solid rgba(212,175,55,0.4)",
-        flexShrink: 0,
-      }}
-      onMouseEnter={(e) =>
-        p
-          ? (e.currentTarget.style.background = "#F0C830")
-          : Object.assign(e.currentTarget.style, {
-              borderColor: G,
-              background: "rgba(212,175,55,0.06)",
-            })
-      }
-      onMouseLeave={(e) =>
-        p
-          ? (e.currentTarget.style.background = G)
-          : Object.assign(e.currentTarget.style, {
-              borderColor: "rgba(212,175,55,0.4)",
-              background: "transparent",
-            })
-      }
+      style={{ flexShrink: 0 }}
     >
-      {children}
-    </motion.a>
+      <Link
+        to={to}
+        style={{
+          display: "inline-flex",
+          alignItems: "center",
+          gap: 10,
+          padding: "13px 28px",
+          fontSize: 12,
+          fontWeight: 600,
+          letterSpacing: "0.14em",
+          textTransform: "uppercase",
+          textDecoration: "none",
+          borderRadius: 0,
+          cursor: "pointer",
+          transition: "all 0.3s ease",
+          background: p ? G : "transparent",
+          color: p ? "#000" : G,
+          border: p ? "none" : "1px solid rgba(212,175,55,0.4)",
+        }}
+        onMouseEnter={(e) =>
+          p
+            ? (e.currentTarget.style.background = "#F0C830")
+            : Object.assign(e.currentTarget.style, {
+                borderColor: G,
+                background: "rgba(212,175,55,0.06)",
+              })
+        }
+        onMouseLeave={(e) =>
+          p
+            ? (e.currentTarget.style.background = G)
+            : Object.assign(e.currentTarget.style, {
+                borderColor: "rgba(212,175,55,0.4)",
+                background: "transparent",
+              })
+        }
+      >
+        {children}
+      </Link>
+    </motion.div>
   );
 }
 
@@ -182,10 +187,10 @@ const NAV_LINKS = [
 ];
 const SERVICES = ["Weddings", "Portraits", "Events", "Graduation"];
 const COMPANY = [
-  { label: "About Me", href: "/about" },
-  { label: "Contact", href: "/contact" },
-  { label: "Journal", href: "/contact" },
-  { label: "Privacy", href: "/contact" },
+  { label: "About Me", to: "/about" },
+  { label: "Contact", to: "/contact" },
+  { label: "Journal", to: "/contact" },
+  { label: "Privacy", to: "/contact" },
 ];
 
 function NavCard({ title, items }) {
@@ -242,10 +247,11 @@ const Footer = () => (
       @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,400&family=Inter:wght@300;400;500;600&display=swap');
       .nav-link-wrap:hover .nav-underline{width:100%!important}
       @media(max-width:768px){.fp{padding:40px 24px 36px!important}.fbg{flex-direction:column!important;gap:32px!important}.fng{grid-template-columns:1fr 1fr!important}.fci{flex-direction:column!important;align-items:flex-start!important;gap:20px!important}.fcb{flex-wrap:wrap!important}.fbt{flex-direction:column!important;text-align:center!important;gap:8px!important}.fpi{margin:0 24px!important;padding:32px 24px!important}}
-      @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+      @media(prefers-reduced-motion:reduce){.site-footer,.site-footer *{animation:none!important;transition:none!important}}
     `}</style>
 
     <div
+      className="site-footer"
       style={{
         backgroundColor: "#000",
         paddingTop: 80,
@@ -325,6 +331,7 @@ const Footer = () => (
                 >
                   <Link
                     to="/"
+                    aria-label="Tech Photography — Home"
                     style={{ display: "inline-block", marginBottom: 24 }}
                   >
                     <motion.div
@@ -337,6 +344,7 @@ const Footer = () => (
                         viewBox="0 0 32 32"
                         fill="none"
                         xmlns="http://www.w3.org/2000/svg"
+                        aria-hidden="true"
                       >
                         {[
                           [4.706, 16],
@@ -507,7 +515,7 @@ const Footer = () => (
                 <NavCard title="Navigate" items={NAV_LINKS} />
                 <NavCard
                   title="Services"
-                  items={SERVICES.map((name) => ({ name, href: "#" }))}
+                  items={SERVICES.map((name) => ({ name, to: "/gallery" }))}
                 />
                 <NavCard title="Company" items={COMPANY} />
               </div>
@@ -598,8 +606,8 @@ const Footer = () => (
                     alignItems: "center",
                   }}
                 >
-                  <CtaButton href="/pakege">Book a Session →</CtaButton>
-                  <CtaButton href="/gallery" variant="outline">
+                  <CtaButton to="/packages">Book a Session →</CtaButton>
+                  <CtaButton to="/gallery" variant="outline">
                     View Gallery →
                   </CtaButton>
                 </div>
@@ -621,16 +629,16 @@ const Footer = () => (
           >
             <p
               style={{
-                color: "#383838",
+                color: "#777",
                 fontSize: 12,
                 letterSpacing: "0.04em",
               }}
             >
-              © 2026 Your Name Photography. All Rights Reserved.
+              © {YEAR} Tech Photography. All Rights Reserved.
             </p>
             <p
               style={{
-                color: "#2C2C2C",
+                color: "#6b6b6b",
                 fontSize: 12,
                 letterSpacing: "0.04em",
               }}

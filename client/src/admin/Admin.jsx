@@ -1,8 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import AdminPhotos from "./AdminPhotos";
 import AdminPackages from "./AdminPackages";
+import { usePackages } from "../context/PackageContext";
 
-/* ─── Tokens (all local — no Tailwind for the structural chrome) ─────────── */
+/* ─── Tokens ─────────────────────────────────────────────────────────────── */
 const T = {
   bg: "#0F0F11",
   surface: "#17171A",
@@ -18,7 +19,7 @@ const T = {
   onlineGreen: "#22C55E",
 };
 
-/* ─── Stat card ─────────────────────────────────────────────────────────── */
+/* ─── Stat card ──────────────────────────────────────────────────────────── */
 function StatCard({ label, value, icon }) {
   return (
     <div
@@ -38,12 +39,13 @@ function StatCard({ label, value, icon }) {
       onMouseLeave={(e) => (e.currentTarget.style.borderColor = T.border)}
     >
       <div
+        aria-hidden="true"
         style={{
           width: 40,
           height: 40,
           borderRadius: 10,
           background: T.accentDim,
-          border: `1px solid rgba(201,168,76,0.2)`,
+          border: "1px solid rgba(201,168,76,0.2)",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
@@ -80,12 +82,28 @@ function StatCard({ label, value, icon }) {
   );
 }
 
-/* ─── Animated tab indicator ────────────────────────────────────────────── */
+/* ─── Tab bar with sliding pill ──────────────────────────────────────────── */
+const ICONS = {
+  photos: (
+    <>
+      <rect x="1" y="3" width="14" height="10" rx="2" />
+      <circle cx="8" cy="8" r="2.5" />
+      <circle cx="12.5" cy="5.5" r="0.8" fill="currentColor" stroke="none" />
+    </>
+  ),
+  packages: (
+    <>
+      <path d="M2 5l6-3 6 3v6l-6 3-6-3V5z" />
+      <path d="M8 2v13M2 5l6 3 6-3" />
+    </>
+  ),
+};
+
 function TabBar({ tabs, activeTab, onSelect }) {
   const activeIdx = tabs.findIndex((t) => t.id === activeTab);
-
   return (
     <div
+      role="tablist"
       style={{
         display: "inline-flex",
         background: T.surface,
@@ -96,8 +114,8 @@ function TabBar({ tabs, activeTab, onSelect }) {
         gap: 2,
       }}
     >
-      {/* Sliding pill */}
       <div
+        aria-hidden="true"
         style={{
           position: "absolute",
           top: 4,
@@ -112,12 +130,13 @@ function TabBar({ tabs, activeTab, onSelect }) {
           zIndex: 0,
         }}
       />
-
       {tabs.map((tab) => {
         const active = tab.id === activeTab;
         return (
           <button
             key={tab.id}
+            role="tab"
+            aria-selected={active}
             onClick={() => onSelect(tab.id)}
             style={{
               position: "relative",
@@ -141,41 +160,18 @@ function TabBar({ tabs, activeTab, onSelect }) {
               if (!active) e.currentTarget.style.color = T.muted;
             }}
           >
-            {tab.id === "photos" && (
-              <svg
-                width="13"
-                height="13"
-                viewBox="0 0 16 16"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.6"
-                style={{ marginRight: 7, verticalAlign: "-2px" }}
-              >
-                <rect x="1" y="3" width="14" height="10" rx="2" />
-                <circle cx="8" cy="8" r="2.5" />
-                <circle
-                  cx="12.5"
-                  cy="5.5"
-                  r="0.8"
-                  fill="currentColor"
-                  stroke="none"
-                />
-              </svg>
-            )}
-            {tab.id === "packages" && (
-              <svg
-                width="13"
-                height="13"
-                viewBox="0 0 16 16"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.6"
-                style={{ marginRight: 7, verticalAlign: "-2px" }}
-              >
-                <path d="M2 5l6-3 6 3v6l-6 3-6-3V5z" />
-                <path d="M8 2v13M2 5l6 3 6-3" />
-              </svg>
-            )}
+            <svg
+              width="13"
+              height="13"
+              viewBox="0 0 16 16"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.6"
+              aria-hidden="true"
+              style={{ marginRight: 7, verticalAlign: "-2px" }}
+            >
+              {ICONS[tab.id]}
+            </svg>
             {tab.label}
           </button>
         );
@@ -184,38 +180,54 @@ function TabBar({ tabs, activeTab, onSelect }) {
   );
 }
 
-/* ─── Main ──────────────────────────────────────────────────────────────── */
+/* ─── Main ───────────────────────────────────────────────────────────────── */
 const Admin = () => {
+  const { packages } = usePackages();
   const [activeTab, setActiveTab] = useState("photos");
   const [visible, setVisible] = useState(true);
   const [timestamp, setTimestamp] = useState("");
+  const [photoCount, setPhotoCount] = useState(null); // reported by AdminPhotos
+  const timer = useRef(null);
 
-  // Fade content on tab switch
+  const handleLogout = () => {
+    if (!window.confirm("Log out of the admin dashboard?")) return;
+    localStorage.removeItem("token");
+    localStorage.removeItem("adminToken");
+    sessionStorage.clear();
+    window.location.replace("/login");
+  };
+
   const switchTab = (id) => {
     if (id === activeTab) return;
     setVisible(false);
-    setTimeout(() => {
+    clearTimeout(timer.current);
+    timer.current = setTimeout(() => {
       setActiveTab(id);
       setVisible(true);
     }, 140);
   };
 
+  useEffect(() => () => clearTimeout(timer.current), []);
+
   useEffect(() => {
-    const fmt = new Intl.DateTimeFormat("en-US", {
-      hour: "numeric",
-      minute: "2-digit",
-      hour12: true,
-    });
-    setTimestamp(fmt.format(new Date()));
+    setTimestamp(
+      new Intl.DateTimeFormat("en-US", {
+        hour: "numeric",
+        minute: "2-digit",
+        hour12: true,
+      }).format(new Date()),
+    );
   }, []);
 
   const tabs = [
     { id: "photos", label: "Photos" },
     { id: "packages", label: "Packages" },
   ];
+  const popularCount = packages.filter((p) => p.popular).length;
 
   return (
     <div
+      className="admin-root"
       style={{
         minHeight: "100vh",
         backgroundColor: T.bg,
@@ -223,23 +235,23 @@ const Admin = () => {
         fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
       }}
     >
+      {/* Scoped to .admin-root so it can never affect the sidebar or other pages */}
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-        * { box-sizing: border-box; margin: 0; padding: 0; }
         @media (max-width: 640px) {
           .admin-header { flex-direction: column !important; align-items: flex-start !important; gap: 12px !important; }
           .admin-stats  { flex-direction: column !important; }
           .admin-tab-row { overflow-x: auto; -webkit-overflow-scrolling: touch; }
         }
         @media (prefers-reduced-motion: reduce) {
-          * { transition-duration: 0ms !important; animation: none !important; }
+          .admin-root * { transition-duration: 0ms !important; animation: none !important; }
         }
       `}</style>
 
       <div
         style={{ maxWidth: 1200, margin: "0 auto", padding: "40px 24px 80px" }}
       >
-        {/* ── Header ───────────────────────────────────────────────────── */}
+        {/* Header */}
         <div
           className="admin-header"
           style={{
@@ -250,6 +262,32 @@ const Admin = () => {
           }}
         >
           <div>
+            <button
+              type="button"
+              onClick={handleLogout}
+              style={{
+                background: T.surface,
+                border: `1px solid ${T.border}`,
+                borderRadius: 99,
+                padding: "6px 14px",
+                fontSize: 12,
+                fontWeight: 500,
+                color: T.body,
+                letterSpacing: "0.02em",
+                cursor: "pointer",
+                transition: "color 0.2s, border-color 0.2s",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.color = T.heading;
+                e.currentTarget.style.borderColor = T.borderHi;
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.color = T.body;
+                e.currentTarget.style.borderColor = T.border;
+              }}
+            >
+              Log out
+            </button>
             <p
               style={{
                 fontSize: 11,
@@ -280,14 +318,13 @@ const Admin = () => {
               <span
                 style={{
                   fontSize: 11,
-                  color: T.subtle,
+                  color: T.muted,
                   letterSpacing: "0.04em",
                 }}
               >
-                Updated {timestamp}
+                Opened {timestamp}
               </span>
             )}
-            {/* Status chip */}
             <div
               style={{
                 display: "flex",
@@ -300,6 +337,7 @@ const Admin = () => {
               }}
             >
               <span
+                aria-hidden="true"
                 style={{
                   width: 7,
                   height: 7,
@@ -323,26 +361,24 @@ const Admin = () => {
           </div>
         </div>
 
-        {/* ── Divider ──────────────────────────────────────────────────── */}
         <div style={{ height: 1, background: T.border, marginBottom: 32 }} />
 
-        {/* ── Stat cards ───────────────────────────────────────────────── */}
+        {/* Stats — real numbers, not hard-coded */}
         <div
           className="admin-stats"
           style={{ display: "flex", gap: 12, marginBottom: 32 }}
         >
-          <StatCard icon="🖼" label="Total Photos" value="48" />
-          <StatCard icon="📦" label="Active Packages" value="6" />
-          <StatCard icon="📅" label="Upcoming Bookings" value="3" />
+          <StatCard icon="🖼" label="Total Photos" value={photoCount ?? "—"} />
+          <StatCard icon="📦" label="Active Packages" value={packages.length} />
+          <StatCard icon="⭐" label="Popular Packages" value={popularCount} />
         </div>
 
-        {/* ── Tab bar + content ─────────────────────────────────────────── */}
         <div className="admin-tab-row" style={{ marginBottom: 20 }}>
           <TabBar tabs={tabs} activeTab={activeTab} onSelect={switchTab} />
         </div>
 
-        {/* Content panel */}
         <div
+          role="tabpanel"
           style={{
             background: T.surface,
             border: `1px solid ${T.border}`,
@@ -355,7 +391,9 @@ const Admin = () => {
             transition: "opacity 0.18s ease, transform 0.18s ease",
           }}
         >
-          {activeTab === "photos" && <AdminPhotos />}
+          {activeTab === "photos" && (
+            <AdminPhotos onCountChange={setPhotoCount} />
+          )}
           {activeTab === "packages" && <AdminPackages />}
         </div>
       </div>

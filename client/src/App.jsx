@@ -1,25 +1,23 @@
 import { Routes, Route, Navigate } from "react-router-dom";
-import { AuthProvider } from "./context/AuthContext";
-import { useAuth } from "./context/AuthContext";
+import { AuthProvider, useAuth } from "./context/AuthContext";
 import { PackageProvider } from "./context/PackageContext";
 import { LanguageProvider } from "./context/LanguageContext";
+
 // Public Pages
 import Home from "./pages/Home";
 import Gallery from "./pages/Gallery";
 import Packages from "./pages/Packages";
-
 import Contact from "./pages/Contact";
 import About from "./pages/About";
 
 // Admin
 import Admin from "./admin/Admin";
-import AdminLogin from "./pages/AdminLogin"; // ← Added
+import AdminLogin from "./pages/AdminLogin";
 
-// Layout Components
-import Navbar from "./components/Navbar";
+// Layout
+import Sidebar from "./components/Sidebar"; // replaces Navbar
 import Footer from "./components/Footer";
 
-// Protected Route Component
 const ProtectedRoute = ({ children }) => {
   const { currentUser, isAdmin, loading } = useAuth();
 
@@ -30,11 +28,9 @@ const ProtectedRoute = ({ children }) => {
       </div>
     );
   }
-
   if (!currentUser || !isAdmin()) {
     return <Navigate to="/secret-login-123" replace />;
   }
-
   return children;
 };
 
@@ -44,40 +40,40 @@ function App() {
       <PackageProvider>
         <LanguageProvider>
           <div className="min-h-screen bg-black text-white">
-            <Navbar />
+            <Sidebar />
 
-            <Routes>
-              {/* Public Routes */}
-              <Route path="/" element={<Home />} />
-              <Route path="/gallery" element={<Gallery />} />
-              <Route path="/packages" element={<Packages />} />
+            {/* Content sits to the right of the sidebar on desktop,
+                and below the top bar on mobile */}
+            <div className="pt-14 md:ml-64 md:pt-0">
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/gallery" element={<Gallery />} />
+                <Route path="/packages" element={<Packages />} />
+                <Route path="/contact" element={<Contact />} />
+                <Route path="/about" element={<About />} />
 
-              <Route path="/contact" element={<Contact />} />
-              <Route path="/about" element={<About />} />
-              <Route path="/test123" element={<h1>TEST ROUTE</h1>} />
+                <Route path="/secret-login-123" element={<AdminLogin />} />
+                <Route
+                  path="/admin"
+                  element={
+                    <ProtectedRoute>
+                      <Admin />
+                    </ProtectedRoute>
+                  }
+                />
 
-              {/* Admin Routes */}
-              <Route path="/secret-login-123" element={<AdminLogin />} />
+                <Route
+                  path="*"
+                  element={
+                    <h1 className="text-center py-20 text-3xl">
+                      Page Not Found
+                    </h1>
+                  }
+                />
+              </Routes>
 
-              <Route
-                path="/admin"
-                element={
-                  <ProtectedRoute>
-                    <Admin />
-                  </ProtectedRoute>
-                }
-              />
-
-              {/* 404 Route */}
-              <Route
-                path="*"
-                element={
-                  <h1 className="text-center py-20 text-3xl">Page Not Found</h1>
-                }
-              />
-            </Routes>
-
-            <Footer />
+              <Footer />
+            </div>
           </div>
         </LanguageProvider>
       </PackageProvider>

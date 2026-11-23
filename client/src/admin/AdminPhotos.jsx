@@ -1,10 +1,8 @@
 import { useState, useEffect, useRef } from "react";
-import Button from "../components/Button";
 import api from "../services/api";
 
-/* ─── Design tokens (matches Admin.jsx + AdminPackages.jsx system) ────────── */
+/* ─── Tokens ─────────────────────────────────────────────────────────────── */
 const T = {
-  bg: "#0F0F11",
   surface: "#17171A",
   surfaceHi: "#1E1E22",
   surfaceDeep: "#0C0C0E",
@@ -19,6 +17,9 @@ const T = {
   red: "#F87171",
   redDim: "rgba(248,113,113,0.08)",
   redBdr: "rgba(248,113,113,0.22)",
+  green: "#4ADE80",
+  greenDim: "rgba(74,222,128,0.1)",
+  greenBdr: "rgba(74,222,128,0.25)",
 };
 
 const CATEGORIES = [
@@ -28,35 +29,37 @@ const CATEGORIES = [
   "events",
   "engagement",
 ];
+const MAX_MB = 10;
+const EMPTY = { title: "", category: "", file: null, previewUrl: null };
 
-/* ─── Shared input style ─────────────────────────────────────────────────── */
+/* ─── Inputs ─────────────────────────────────────────────────────────────── */
 function useInputStyle() {
   const [focused, setFocused] = useState(false);
-  const style = {
-    width: "100%",
-    background: T.surfaceDeep,
-    border: `1px solid ${focused ? T.accentBdr : T.border}`,
-    borderRadius: 10,
-    padding: "11px 14px",
-    fontSize: 13,
-    color: T.heading,
-    outline: "none",
-    transition: "border-color 0.18s, box-shadow 0.18s",
-    boxShadow: focused ? `0 0 0 3px ${T.accentDim}` : "none",
-    fontFamily: "inherit",
-  };
   return {
-    style,
+    style: {
+      width: "100%",
+      background: T.surfaceDeep,
+      border: `1px solid ${focused ? T.accentBdr : T.border}`,
+      borderRadius: 10,
+      padding: "11px 14px",
+      fontSize: 13,
+      color: T.heading,
+      outline: "none",
+      transition: "border-color 0.18s, box-shadow 0.18s",
+      boxShadow: focused ? `0 0 0 3px ${T.accentDim}` : "none",
+      fontFamily: "inherit",
+    },
     onFocus: () => setFocused(true),
     onBlur: () => setFocused(false),
   };
 }
 
-function StyledInput({ value, onChange, placeholder, type = "text" }) {
+function StyledInput({ id, value, onChange, placeholder }) {
   const input = useInputStyle();
   return (
     <input
-      type={type}
+      id={id}
+      type="text"
       value={value}
       onChange={onChange}
       placeholder={placeholder}
@@ -67,12 +70,15 @@ function StyledInput({ value, onChange, placeholder, type = "text" }) {
   );
 }
 
-function StyledSelect({ value, onChange, children }) {
+function StyledSelect({ id, value, onChange, children }) {
   const input = useInputStyle();
   return (
     <select
+      id={id}
       value={value}
       onChange={onChange}
+      onFocus={input.onFocus}
+      onBlur={input.onBlur}
       style={{
         ...input.style,
         cursor: "pointer",
@@ -82,17 +88,16 @@ function StyledSelect({ value, onChange, children }) {
         backgroundPosition: "right 14px center",
         paddingRight: 36,
       }}
-      onFocus={input.onFocus}
-      onBlur={input.onBlur}
     >
       {children}
     </select>
   );
 }
 
-function FieldLabel({ children }) {
+function FieldLabel({ htmlFor, children }) {
   return (
     <label
+      htmlFor={htmlFor}
       style={{
         fontSize: 12,
         fontWeight: 500,
@@ -107,17 +112,46 @@ function FieldLabel({ children }) {
   );
 }
 
-/* ─── Dropzone area ──────────────────────────────────────────────────────── */
+/* ─── Dropzone ───────────────────────────────────────────────────────────── */
+const uploadIcon = (color) => (
+  <svg
+    width="22"
+    height="22"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke={color}
+    strokeWidth="1.6"
+    strokeLinecap="round"
+    aria-hidden="true"
+  >
+    <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
+    <polyline points="17 8 12 3 7 8" />
+    <line x1="12" y1="3" x2="12" y2="15" />
+  </svg>
+);
+
 function DropzoneArea({ previewUrl, onChange }) {
   const [hover, setHover] = useState(false);
   const inputRef = useRef(null);
+  const open = () => inputRef.current?.click();
 
   return (
     <div>
       <div
-        onClick={() => inputRef.current?.click()}
+        role="button"
+        tabIndex={0}
+        aria-label={previewUrl ? "Change selected image" : "Select an image"}
+        onClick={open}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            open();
+          }
+        }}
         onMouseEnter={() => setHover(true)}
         onMouseLeave={() => setHover(false)}
+        onFocus={() => setHover(true)}
+        onBlur={() => setHover(false)}
         style={{
           border: `1.5px dashed ${hover ? T.accentBdr : T.border}`,
           borderRadius: 14,
@@ -127,13 +161,14 @@ function DropzoneArea({ previewUrl, onChange }) {
           transition: "border-color 0.2s, background 0.2s",
           overflow: "hidden",
           position: "relative",
+          outline: "none",
         }}
       >
         {previewUrl ? (
           <div style={{ position: "relative" }}>
             <img
               src={previewUrl}
-              alt="Preview"
+              alt="Selected preview"
               style={{
                 width: "100%",
                 height: 220,
@@ -142,7 +177,6 @@ function DropzoneArea({ previewUrl, onChange }) {
                 borderRadius: 12,
               }}
             />
-            {/* Swap overlay */}
             <div
               style={{
                 position: "absolute",
@@ -158,19 +192,7 @@ function DropzoneArea({ previewUrl, onChange }) {
                 transition: "opacity 0.2s",
               }}
             >
-              <svg
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke={T.accent}
-                strokeWidth="1.6"
-                strokeLinecap="round"
-              >
-                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
-                <polyline points="17 8 12 3 7 8" />
-                <line x1="12" y1="3" x2="12" y2="15" />
-              </svg>
+              {uploadIcon(T.accent)}
               <span style={{ fontSize: 12, color: T.accent, fontWeight: 500 }}>
                 Click to change
               </span>
@@ -199,19 +221,7 @@ function DropzoneArea({ previewUrl, onChange }) {
                 transition: "all 0.2s",
               }}
             >
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke={hover ? T.accent : T.muted}
-                strokeWidth="1.6"
-                strokeLinecap="round"
-              >
-                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
-                <polyline points="17 8 12 3 7 8" />
-                <line x1="12" y1="3" x2="12" y2="15" />
-              </svg>
+              {uploadIcon(hover ? T.accent : T.muted)}
             </div>
             <div style={{ textAlign: "center" }}>
               <p
@@ -226,44 +236,21 @@ function DropzoneArea({ previewUrl, onChange }) {
                 Click to select image
               </p>
               <p style={{ fontSize: 11, color: T.muted }}>
-                JPG, PNG, WEBP · Max 10MB
+                JPG, PNG, WEBP · Max {MAX_MB}MB
               </p>
             </div>
           </div>
         )}
       </div>
-
-      {/* Hidden actual file input */}
       <input
         ref={inputRef}
         type="file"
         accept="image/*"
         onChange={onChange}
         style={{ display: "none" }}
+        tabIndex={-1}
       />
     </div>
-  );
-}
-
-/* ─── Category badge ─────────────────────────────────────────────────────── */
-function CategoryBadge({ category }) {
-  return (
-    <span
-      style={{
-        fontSize: 10,
-        letterSpacing: "0.12em",
-        textTransform: "uppercase",
-        fontWeight: 600,
-        color: T.heading,
-        background: "rgba(0,0,0,0.65)",
-        backdropFilter: "blur(8px)",
-        border: `1px solid ${T.borderHi}`,
-        borderRadius: 99,
-        padding: "3px 10px",
-      }}
-    >
-      {category}
-    </span>
   );
 }
 
@@ -271,6 +258,7 @@ function CategoryBadge({ category }) {
 function PhotoCard({ photo, onDelete }) {
   const [hover, setHover] = useState(false);
   const id = photo._id || photo.id;
+  const src = photo.imageUrl || photo.image || photo.url;
   const date = photo.createdAt
     ? new Date(photo.createdAt).toLocaleDateString("en-US", {
         month: "short",
@@ -296,11 +284,11 @@ function PhotoCard({ photo, onDelete }) {
           "transform 0.22s cubic-bezier(0.22,1,0.36,1), box-shadow 0.22s, border-color 0.2s",
       }}
     >
-      {/* Image */}
       <div style={{ position: "relative", overflow: "hidden", height: 220 }}>
         <img
-          src={photo.imageUrl}
+          src={src}
           alt={photo.title}
+          loading="lazy"
           style={{
             width: "100%",
             height: "100%",
@@ -310,7 +298,6 @@ function PhotoCard({ photo, onDelete }) {
             transition: "transform 0.5s cubic-bezier(0.22,1,0.36,1)",
           }}
         />
-        {/* Hover gradient */}
         <div
           style={{
             position: "absolute",
@@ -321,13 +308,27 @@ function PhotoCard({ photo, onDelete }) {
             transition: "opacity 0.3s",
           }}
         />
-        {/* Category badge */}
-        <div style={{ position: "absolute", top: 12, right: 12 }}>
-          <CategoryBadge category={photo.category} />
-        </div>
+        <span
+          style={{
+            position: "absolute",
+            top: 12,
+            right: 12,
+            fontSize: 10,
+            letterSpacing: "0.12em",
+            textTransform: "uppercase",
+            fontWeight: 600,
+            color: T.heading,
+            background: "rgba(0,0,0,0.65)",
+            backdropFilter: "blur(8px)",
+            border: `1px solid ${T.borderHi}`,
+            borderRadius: 99,
+            padding: "3px 10px",
+          }}
+        >
+          {photo.category}
+        </span>
       </div>
 
-      {/* Meta */}
       <div style={{ padding: "18px 20px 20px" }}>
         <h4
           style={{
@@ -355,63 +356,45 @@ function PhotoCard({ photo, onDelete }) {
           Uploaded {date}
         </p>
 
-        {/* Actions */}
-        <div style={{ display: "flex", gap: 8 }}>
-          <button
-            style={{
-              flex: 1,
-              padding: "8px 0",
-              borderRadius: 8,
-              background: T.surfaceHi,
-              border: `1px solid ${T.border}`,
-              color: T.body,
-              fontSize: 12,
-              fontWeight: 500,
-              cursor: "pointer",
-              transition: "border-color 0.15s, color 0.15s",
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.borderColor = T.borderHi;
-              e.currentTarget.style.color = T.heading;
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = T.border;
-              e.currentTarget.style.color = T.body;
-            }}
-          >
-            Edit
-          </button>
-          <button
-            onClick={() => onDelete(id)}
-            style={{
-              flex: 1,
-              padding: "8px 0",
-              borderRadius: 8,
-              background: T.redDim,
-              border: `1px solid ${T.redBdr}`,
-              color: T.red,
-              fontSize: 12,
-              fontWeight: 500,
-              cursor: "pointer",
-              transition: "background 0.15s",
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.background = "rgba(248,113,113,0.14)";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.background = T.redDim;
-            }}
-          >
-            Delete
-          </button>
-        </div>
+        <button
+          onClick={() => onDelete(id)}
+          style={{
+            width: "100%",
+            padding: "8px 0",
+            borderRadius: 8,
+            background: T.redDim,
+            border: `1px solid ${T.redBdr}`,
+            color: T.red,
+            fontSize: 12,
+            fontWeight: 500,
+            cursor: "pointer",
+            transition: "background 0.15s",
+          }}
+          onMouseEnter={(e) =>
+            (e.currentTarget.style.background = "rgba(248,113,113,0.14)")
+          }
+          onMouseLeave={(e) => (e.currentTarget.style.background = T.redDim)}
+        >
+          Delete
+        </button>
       </div>
     </div>
   );
 }
 
-/* ─── Skeleton card ──────────────────────────────────────────────────────── */
 function SkeletonCard() {
+  const bar = (h, w, delay = "0s", extra = {}) => (
+    <div
+      style={{
+        height: h,
+        width: w,
+        borderRadius: 6,
+        background: T.surfaceHi,
+        animation: `adminPhotosPulse 1.8s ease-in-out infinite ${delay}`,
+        ...extra,
+      }}
+    />
+  );
   return (
     <div
       style={{
@@ -421,13 +404,7 @@ function SkeletonCard() {
         overflow: "hidden",
       }}
     >
-      <div
-        style={{
-          height: 220,
-          background: T.surfaceHi,
-          animation: "pulse 1.8s ease-in-out infinite",
-        }}
-      />
+      {bar(220, "100%", "0s", { borderRadius: 0 })}
       <div
         style={{
           padding: "18px 20px 20px",
@@ -436,39 +413,14 @@ function SkeletonCard() {
           gap: 10,
         }}
       >
-        <div
-          style={{
-            height: 14,
-            width: "65%",
-            borderRadius: 6,
-            background: T.surfaceHi,
-            animation: "pulse 1.8s ease-in-out infinite",
-          }}
-        />
-        <div
-          style={{
-            height: 10,
-            width: "40%",
-            borderRadius: 6,
-            background: T.surfaceHi,
-            animation: "pulse 1.8s ease-in-out infinite 0.15s",
-          }}
-        />
-        <div
-          style={{
-            height: 32,
-            borderRadius: 8,
-            marginTop: 4,
-            background: T.surfaceHi,
-            animation: "pulse 1.8s ease-in-out infinite 0.3s",
-          }}
-        />
+        {bar(14, "65%")}
+        {bar(10, "40%", "0.15s")}
+        {bar(32, "100%", "0.3s", { borderRadius: 8, marginTop: 4 })}
       </div>
     </div>
   );
 }
 
-/* ─── Empty state ────────────────────────────────────────────────────────── */
 function EmptyState() {
   return (
     <div
@@ -501,6 +453,7 @@ function EmptyState() {
           stroke={T.accent}
           strokeWidth="1.6"
           strokeLinecap="round"
+          aria-hidden="true"
         >
           <rect x="3" y="3" width="18" height="18" rx="2" />
           <circle cx="8.5" cy="8.5" r="1.5" />
@@ -533,24 +486,28 @@ function EmptyState() {
   );
 }
 
-/* ─── Main component ─────────────────────────────────────────────────────── */
-const AdminPhotos = () => {
+/* ─── Main ───────────────────────────────────────────────────────────────── */
+const AdminPhotos = ({ onCountChange }) => {
   const [photos, setPhotos] = useState([]);
-  const [newPhoto, setNewPhoto] = useState({
-    title: "",
-    category: "",
-    file: null,
-    previewUrl: null,
-  });
+  const [newPhoto, setNewPhoto] = useState(EMPTY);
   const [uploading, setUploading] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [notice, setNotice] = useState(null);
+  const noticeTimer = useRef(null);
+
+  const say = (type, text) => {
+    setNotice({ type, text });
+    clearTimeout(noticeTimer.current);
+    noticeTimer.current = setTimeout(() => setNotice(null), 3500);
+  };
 
   const fetchPhotos = async () => {
     try {
       const res = await api.get("/photos");
-      setPhotos(res.data);
+      setPhotos(Array.isArray(res.data) ? res.data : []);
     } catch (error) {
       console.error("Failed to fetch photos:", error);
+      say("error", "Could not load photos.");
     } finally {
       setLoading(false);
     }
@@ -558,36 +515,51 @@ const AdminPhotos = () => {
 
   useEffect(() => {
     fetchPhotos();
+    return () => clearTimeout(noticeTimer.current);
   }, []);
+
+  // Tell the dashboard how many photos there are
+  useEffect(() => {
+    if (!loading) onCountChange?.(photos.length);
+  }, [loading, photos.length]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Free the preview image from memory when it changes or the component closes
+  useEffect(() => {
+    return () => {
+      if (newPhoto.previewUrl) URL.revokeObjectURL(newPhoto.previewUrl);
+    };
+  }, [newPhoto.previewUrl]);
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
-    if (file) {
-      const previewUrl = URL.createObjectURL(file);
-      setNewPhoto({ ...newPhoto, file, previewUrl });
-    }
+    e.target.value = ""; // lets you pick the same file again
+    if (!file) return;
+    if (!file.type.startsWith("image/"))
+      return say("error", "Please choose an image file.");
+    if (file.size > MAX_MB * 1024 * 1024)
+      return say("error", `Image is larger than ${MAX_MB}MB.`);
+    setNewPhoto((p) => ({ ...p, file, previewUrl: URL.createObjectURL(file) }));
   };
 
   const handleUpload = async () => {
-    if (!newPhoto.file || !newPhoto.title || !newPhoto.category) {
-      alert("Please fill all fields and select an image");
-      return;
+    if (!newPhoto.file || !newPhoto.title.trim() || !newPhoto.category) {
+      return say("error", "Please add an image, a title and a category.");
     }
     setUploading(true);
     const formData = new FormData();
-    formData.append("title", newPhoto.title);
+    formData.append("title", newPhoto.title.trim());
     formData.append("category", newPhoto.category);
     formData.append("image", newPhoto.file);
     try {
-      await api.post("/photos", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-      alert("✅ Photo uploaded successfully!");
+      // No manual Content-Type: the browser adds it together with the file boundary
+      await api.post("/photos", formData);
+      say("success", "Photo uploaded successfully.");
+      setNewPhoto(EMPTY);
       fetchPhotos();
-      setNewPhoto({ title: "", category: "", file: null, previewUrl: null });
     } catch (error) {
       console.error(error);
-      alert(
+      say(
+        "error",
         error.response?.data?.message || "Upload failed. Please try again.",
       );
     } finally {
@@ -599,41 +571,46 @@ const AdminPhotos = () => {
     if (!window.confirm("Delete this photo?")) return;
     try {
       await api.delete(`/photos/${id}`);
-      alert("Photo deleted successfully");
-      fetchPhotos();
+      setPhotos((prev) => prev.filter((p) => (p._id || p.id) !== id));
+      say("success", "Photo deleted.");
     } catch {
-      alert("Failed to delete photo");
+      say("error", "Failed to delete photo.");
     }
   };
 
   const canUpload =
-    !uploading && !!newPhoto.file && !!newPhoto.title && !!newPhoto.category;
+    !uploading &&
+    !!newPhoto.file &&
+    !!newPhoto.title.trim() &&
+    !!newPhoto.category;
+  const gridStyle = {
+    display: "grid",
+    gridTemplateColumns: "repeat(3, 1fr)",
+    gap: 16,
+  };
 
   return (
     <div
+      className="admin-photos"
       style={{ fontFamily: "'Inter', system-ui, sans-serif", color: T.heading }}
     >
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-        * { box-sizing: border-box; }
-        @keyframes pulse {
-          0%, 100% { opacity: 1; }
-          50%       { opacity: 0.45; }
-        }
+        @keyframes adminPhotosPulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.45; } }
+        @keyframes adminPhotosSpin  { to { transform: rotate(360deg); } }
         @media (max-width: 640px) {
-          .photos-upload-grid { grid-template-columns: 1fr !important; }
-          .photos-grid         { grid-template-columns: 1fr !important; }
-          .photos-header       { flex-direction: column !important; align-items: flex-start !important; gap: 8px !important; }
+          .photos-upload-grid, .photos-grid { grid-template-columns: 1fr !important; }
+          .photos-header { flex-direction: column !important; align-items: flex-start !important; gap: 8px !important; }
         }
         @media (min-width: 641px) and (max-width: 1024px) {
           .photos-grid { grid-template-columns: repeat(2, 1fr) !important; }
         }
         @media (prefers-reduced-motion: reduce) {
-          * { transition-duration: 0ms !important; animation: none !important; }
+          .admin-photos * { transition-duration: 0ms !important; animation: none !important; }
         }
       `}</style>
 
-      {/* ── Header ────────────────────────────────────────────────────────── */}
+      {/* Header */}
       <div
         className="photos-header"
         style={{
@@ -671,18 +648,6 @@ const AdminPhotos = () => {
               padding: "6px 14px",
             }}
           >
-            <svg
-              width="12"
-              height="12"
-              viewBox="0 0 16 16"
-              fill="none"
-              stroke={T.accent}
-              strokeWidth="1.6"
-              strokeLinecap="round"
-            >
-              <rect x="1" y="3" width="14" height="10" rx="2" />
-              <circle cx="8" cy="8" r="2.2" />
-            </svg>
             <span style={{ fontSize: 12, fontWeight: 500, color: T.body }}>
               {photos.length} {photos.length === 1 ? "photo" : "photos"}
             </span>
@@ -690,10 +655,27 @@ const AdminPhotos = () => {
         )}
       </div>
 
-      {/* ── Divider ───────────────────────────────────────────────────────── */}
       <div style={{ height: 1, background: T.border, marginBottom: 28 }} />
 
-      {/* ── Upload panel ──────────────────────────────────────────────────── */}
+      {/* Status message */}
+      {notice && (
+        <div
+          role="status"
+          style={{
+            marginBottom: 20,
+            padding: "11px 16px",
+            borderRadius: 10,
+            fontSize: 13,
+            color: notice.type === "error" ? T.red : T.green,
+            background: notice.type === "error" ? T.redDim : T.greenDim,
+            border: `1px solid ${notice.type === "error" ? T.redBdr : T.greenBdr}`,
+          }}
+        >
+          {notice.text}
+        </div>
+      )}
+
+      {/* Upload panel */}
       <div
         style={{
           background: T.surface,
@@ -738,7 +720,6 @@ const AdminPhotos = () => {
             alignItems: "start",
           }}
         >
-          {/* Left: dropzone */}
           <div>
             <FieldLabel>Image file</FieldLabel>
             <DropzoneArea
@@ -747,25 +728,26 @@ const AdminPhotos = () => {
             />
           </div>
 
-          {/* Right: metadata */}
           <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
             <div>
-              <FieldLabel>Photo title *</FieldLabel>
+              <FieldLabel htmlFor="photo-title">Photo title *</FieldLabel>
               <StyledInput
+                id="photo-title"
                 value={newPhoto.title}
                 placeholder="e.g. Golden Hour Ceremony"
                 onChange={(e) =>
-                  setNewPhoto({ ...newPhoto, title: e.target.value })
+                  setNewPhoto((p) => ({ ...p, title: e.target.value }))
                 }
               />
             </div>
 
             <div>
-              <FieldLabel>Category *</FieldLabel>
+              <FieldLabel htmlFor="photo-category">Category *</FieldLabel>
               <StyledSelect
+                id="photo-category"
                 value={newPhoto.category}
                 onChange={(e) =>
-                  setNewPhoto({ ...newPhoto, category: e.target.value })
+                  setNewPhoto((p) => ({ ...p, category: e.target.value }))
                 }
               >
                 <option value="">Select a category</option>
@@ -781,7 +763,6 @@ const AdminPhotos = () => {
               </StyledSelect>
             </div>
 
-            {/* Upload button */}
             <button
               onClick={handleUpload}
               disabled={!canUpload}
@@ -825,34 +806,21 @@ const AdminPhotos = () => {
                     stroke="currentColor"
                     strokeWidth="2"
                     strokeLinecap="round"
-                    style={{ animation: "spin 0.9s linear infinite" }}
+                    aria-hidden="true"
+                    style={{
+                      animation: "adminPhotosSpin 0.9s linear infinite",
+                    }}
                   >
                     <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" />
                   </svg>
                   Uploading…
                 </>
               ) : (
-                <>
-                  <svg
-                    width="13"
-                    height="13"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                  >
-                    <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
-                    <polyline points="17 8 12 3 7 8" />
-                    <line x1="12" y1="3" x2="12" y2="15" />
-                  </svg>
-                  Upload to gallery
-                </>
+                "Upload to gallery"
               )}
             </button>
 
-            {/* Helper hint */}
-            {!newPhoto.file && (
+            {!canUpload && !uploading && (
               <p
                 style={{
                   fontSize: 11,
@@ -868,7 +836,6 @@ const AdminPhotos = () => {
         </div>
       </div>
 
-      {/* ── Section label ─────────────────────────────────────────────────── */}
       {(photos.length > 0 || loading) && (
         <div style={{ marginBottom: 20 }}>
           <p
@@ -887,29 +854,14 @@ const AdminPhotos = () => {
         </div>
       )}
 
-      {/* ── Photo grid ────────────────────────────────────────────────────── */}
       {loading ? (
-        <div
-          className="photos-grid"
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(3, 1fr)",
-            gap: 16,
-          }}
-        >
+        <div className="photos-grid" style={gridStyle} aria-busy="true">
           {[...Array(6)].map((_, i) => (
             <SkeletonCard key={i} />
           ))}
         </div>
       ) : photos.length > 0 ? (
-        <div
-          className="photos-grid"
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(3, 1fr)",
-            gap: 16,
-          }}
-        >
+        <div className="photos-grid" style={gridStyle}>
           {photos.map((photo) => (
             <PhotoCard
               key={photo._id || photo.id}
@@ -921,10 +873,6 @@ const AdminPhotos = () => {
       ) : (
         <EmptyState />
       )}
-
-      <style>{`
-        @keyframes spin { to { transform: rotate(360deg); } }
-      `}</style>
     </div>
   );
 };

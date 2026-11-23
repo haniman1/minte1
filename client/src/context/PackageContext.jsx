@@ -25,7 +25,7 @@ export const PackageProvider = ({ children }) => {
 
   const fetchPackages = useCallback(async () => {
     try {
-      const res = await api.get("/api/packages");
+      const res = await api.get("/packages");
 
       setPackages((prev) => {
         const same = JSON.stringify(prev) === JSON.stringify(res.data);

@@ -9,14 +9,15 @@ const Button = ({
   ...props
 }) => {
   const baseStyles =
-    "inline-flex items-center justify-center font-medium transition-all duration-300 rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-black";
+    "inline-flex items-center justify-center font-medium transition-all duration-300 rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] focus-visible:ring-offset-2 focus-visible:ring-offset-black";
 
   const variants = {
     primary:
-      "bg-white text-black hover:bg-slate-100 hover:shadow-[0px_0px_30px_14px] hover:shadow-white/50 shadow-white/30",
+      "bg-[#D4AF37] text-black hover:bg-[#F0C830] hover:shadow-[0px_0px_30px_10px] hover:shadow-[#D4AF37]/40 shadow-[#D4AF37]/30",
     secondary:
       "bg-transparent border border-slate-600 hover:bg-slate-800 text-white",
-    outline: "border border-white/70 hover:bg-white/10 text-white",
+    outline:
+      "border border-[#D4AF37]/60 text-[#D4AF37] hover:border-[#D4AF37] hover:bg-[#D4AF37]/10",
   };
 
   const sizes = {
@@ -27,7 +28,6 @@ const Button = ({
 
   const classes = `${baseStyles} ${variants[variant]} ${sizes[size]} ${className}`;
 
-  // If 'to' prop is passed, render as Link (for navigation)
   if (to) {
     return (
       <Link to={to} className={classes} {...props}>
@@ -36,7 +36,6 @@ const Button = ({
     );
   }
 
-  // Otherwise render as normal button
   return (
     <button className={classes} {...props}>
       {children}

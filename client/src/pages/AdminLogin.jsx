@@ -74,6 +74,7 @@ const AdminLogin = () => {
 
   return (
     <div
+      className="admin-login"
       style={{
         minHeight: "100vh",
         backgroundColor: T.bg,
@@ -86,11 +87,13 @@ const AdminLogin = () => {
         overflow: "hidden",
       }}
     >
+      {/* Reset is scoped to .admin-login so it can't affect the sidebar/navbar */}
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+        .admin-login, .admin-login * { box-sizing: border-box; }
+        .admin-login * { margin: 0; padding: 0; }
         @media (prefers-reduced-motion: reduce) {
-          * { transition-duration: 0ms !important; animation: none !important; }
+          .admin-login * { transition-duration: 0ms !important; animation: none !important; }
         }
         @keyframes spin { to { transform: rotate(360deg); } }
       `}</style>
@@ -189,6 +192,7 @@ const AdminLogin = () => {
               {/* Email */}
               <div>
                 <label
+                  htmlFor="admin-email"
                   style={{
                     fontSize: 12,
                     fontWeight: 500,
@@ -201,6 +205,7 @@ const AdminLogin = () => {
                   Email address
                 </label>
                 <input
+                  id="admin-email"
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -216,6 +221,7 @@ const AdminLogin = () => {
               {/* Password */}
               <div>
                 <label
+                  htmlFor="admin-password"
                   style={{
                     fontSize: 12,
                     fontWeight: 500,
@@ -229,6 +235,7 @@ const AdminLogin = () => {
                 </label>
                 <div style={{ position: "relative" }}>
                   <input
+                    id="admin-password"
                     type={showPw ? "text" : "password"}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
@@ -298,6 +305,7 @@ const AdminLogin = () => {
               {/* Error */}
               {error && (
                 <div
+                  role="alert"
                   style={{
                     display: "flex",
                     alignItems: "center",
@@ -382,43 +390,6 @@ const AdminLogin = () => {
               </button>
             </div>
           </form>
-
-          {/* Demo credentials */}
-          <div
-            style={{
-              marginTop: 24,
-              paddingTop: 20,
-              borderTop: `1px solid ${T.border}`,
-              textAlign: "center",
-            }}
-          >
-            <p
-              style={{
-                fontSize: 11,
-                color: T.muted,
-                marginBottom: 6,
-                letterSpacing: "0.06em",
-                textTransform: "uppercase",
-              }}
-            >
-              Demo credentials
-            </p>
-            <code
-              style={{
-                fontSize: 12,
-                color: T.body,
-                background: T.surfaceDeep,
-                border: `1px solid ${T.border}`,
-                borderRadius: 7,
-                padding: "6px 12px",
-                display: "inline-block",
-                fontFamily: "'SF Mono', 'Fira Code', monospace",
-                letterSpacing: "0.04em",
-              }}
-            >
-              admin@photo.com · admin123
-            </code>
-          </div>
         </div>
 
         {/* Back link */}

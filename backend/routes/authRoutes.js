@@ -8,7 +8,4 @@ const authRoutes = express.Router();
 // Public routes
 authRoutes.post("/login", login);
 
-// Seed admin (you can call this once)
-authRoutes.get("/seed-admin", seedAdmin);
-
 export default authRoutes;

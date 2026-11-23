@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import Button from "../components/Button";
 import { usePackages } from "../context/PackageContext";
 
 const fallbackFeatures = [
@@ -95,7 +95,7 @@ function PackageCard({ pkg, index }) {
         <div className="mb-8 flex items-center justify-between">
           <span
             className={`flex h-12 w-12 items-center justify-center rounded-2xl text-sm font-black ${
-              popular ? "bg-white text-black" : "bg-white/10 text-white"
+              popular ? "bg-white text-black" : "bg-white/10 text-[#D4AF37]"
             }`}
           >
             0{index + 1}
@@ -108,7 +108,7 @@ function PackageCard({ pkg, index }) {
           )}
         </div>
 
-        <h2 className="text-3xl font-semibold tracking-tight text-white">
+        <h2 className="text-3xl font-semibold tracking-tight text-[#D4AF37]">
           {pkg.name || "Photography Package"}
         </h2>
 
@@ -116,7 +116,7 @@ function PackageCard({ pkg, index }) {
           Starting from
         </p>
 
-        <p className="mt-2 text-6xl font-black tracking-[-0.07em] text-white">
+        <p className="mt-2 text-6xl font-black tracking-[-0.07em] text-[#D4AF37]">
           {formatPrice(pkg.price)}
         </p>
 
@@ -131,7 +131,7 @@ function PackageCard({ pkg, index }) {
           <li key={`${feature}-${featureIndex}`} className="flex gap-3">
             <span
               className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-xs ${
-                popular ? "bg-white text-black" : "bg-white/10 text-white"
+                popular ? "bg-white text-black" : "bg-white/10 text-[#D4AF37]"
               }`}
             >
               ✓
@@ -143,16 +143,13 @@ function PackageCard({ pkg, index }) {
         ))}
       </ul>
 
-      <Link
+      <Button
         to="/contact"
-        className={`mt-auto flex w-full items-center justify-center rounded-full px-6 py-4 text-center text-sm font-black uppercase tracking-[0.16em] transition duration-300 hover:scale-[1.02] ${
-          popular
-            ? "bg-white text-black shadow-[0_0_34px_rgba(255,255,255,0.2)] hover:bg-neutral-200"
-            : "border border-white/15 bg-white/10 text-white hover:bg-white hover:text-black"
-        }`}
+        variant={popular ? "primary" : "outline"}
+        className="mt-auto w-full"
       >
-        Inquire About This Package
-      </Link>
+        Inquire Now
+      </Button>
     </article>
   );
 }
@@ -167,17 +164,17 @@ const Packages = () => {
       <div className="pointer-events-none fixed inset-0 bg-[radial-gradient(circle_at_top,rgba(147,197,253,0.13),transparent_34%),radial-gradient(circle_at_bottom_right,rgba(245,158,11,0.08),transparent_34%)]" />
 
       <main className="relative z-10">
-        <section className="mx-auto max-w-5xl px-6 pb-14 pt-24 text-center md:pt-32">
+        <section className="mx-auto max-w-5xl px-6 pb-8 pt-16 text-center md:pt-20">
           <div className="animate-[fadeUp_700ms_ease-out_both]">
             <p className="text-xs font-medium uppercase tracking-[0.38em] text-blue-100/70">
               Studio Pricing
             </p>
 
-            <h1 className="mt-5 text-5xl font-black tracking-[-0.06em] md:text-7xl">
+            <h1 className="mt-3 text-4xl font-black tracking-[-0.05em] text-[#D4AF37] md:text-5xl">
               Photography Packages
             </h1>
 
-            <p className="mx-auto mt-6 max-w-2xl text-base leading-8 text-neutral-400 md:text-lg">
+            <p className="mx-auto mt-3 max-w-xl text-sm leading-7 text-neutral-400 md:text-base">
               Choose the perfect package for your timeless moments. Each
               experience is shaped around polished direction, intentional
               coverage, and premium delivery.
@@ -207,15 +204,15 @@ const Packages = () => {
           <div className="border-y border-white/10 py-6">
             <div className="grid gap-4 text-sm text-neutral-300 md:grid-cols-3">
               <div className="flex items-center justify-center gap-2">
-                <span className="text-white">✓</span>
+                <span className="text-[#D4AF37]">✓</span>
                 Professional editing included
               </div>
               <div className="flex items-center justify-center gap-2">
-                <span className="text-white">✓</span>
+                <span className="text-[#D4AF37]">✓</span>
                 High-resolution delivery
               </div>
               <div className="flex items-center justify-center gap-2">
-                <span className="text-white">✓</span>
+                <span className="text-[#D4AF37]">✓</span>
                 Fast turnaround time
               </div>
             </div>
@@ -238,12 +235,9 @@ const Packages = () => {
               experience.
             </p>
 
-            <Link
-              to="/contact"
-              className="mt-9 inline-flex rounded-full bg-white px-7 py-3.5 text-sm font-black uppercase tracking-[0.16em] text-black transition duration-300 hover:scale-[1.02] hover:bg-neutral-200"
-            >
+            <Button to="/contact" className="mt-9">
               Contact Photographer
-            </Link>
+            </Button>
           </div>
         </section>
       </main>
