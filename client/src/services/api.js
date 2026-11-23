@@ -1,9 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL:
-    import.meta.env.VITE_API_URL ||
-    "https://minte1-e7uf-pko4dmt8u-haniels-projects-16c39d3d.vercel.app",
+  baseURL: import.meta.env.VITE_API_URL || "https://minte1-e7uf.vercel.app",
 });
 
 // Add token to every request automatically
