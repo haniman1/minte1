@@ -18,6 +18,9 @@ import AdminLogin from "./pages/AdminLogin";
 import Sidebar from "./components/Sidebar"; // replaces Navbar
 import Footer from "./components/Footer";
 
+// One place to rename the hidden admin login page
+const ADMIN_LOGIN_PATH = "/secret-login-123";
+
 const ProtectedRoute = ({ children }) => {
   const { currentUser, isAdmin, loading } = useAuth();
 
@@ -29,7 +32,7 @@ const ProtectedRoute = ({ children }) => {
     );
   }
   if (!currentUser || !isAdmin()) {
-    return <Navigate to="/admin/login" replace />;
+    return <Navigate to={ADMIN_LOGIN_PATH} replace />;
   }
   return children;
 };
@@ -52,7 +55,7 @@ function App() {
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/about" element={<About />} />
 
-                <Route path="/secret-login-123" element={<AdminLogin />} />
+                <Route path={ADMIN_LOGIN_PATH} element={<AdminLogin />} />
                 <Route
                   path="/admin"
                   element={
