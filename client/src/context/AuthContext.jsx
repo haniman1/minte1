@@ -21,9 +21,12 @@ export const AuthProvider = ({ children }) => {
       setLoading(false);
     }
   }, []);
+
   const login = async (email, password) => {
     try {
-      const res = await api.post("/api/auth/login", { email, password });
+      // The base URL in services/api.js already ends with /api,
+      // so this becomes  <backend>/api/auth/login
+      const res = await api.post("/auth/login", { email, password });
 
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("user", JSON.stringify(res.data.user));
