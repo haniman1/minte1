@@ -29,7 +29,7 @@ const ProtectedRoute = ({ children }) => {
     );
   }
   if (!currentUser || !isAdmin()) {
-    return <Navigate to="/secret-login-123" replace />;
+    return <Navigate to="/admin/login" replace />;
   }
   return children;
 };
