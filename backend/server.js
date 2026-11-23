@@ -5,7 +5,7 @@ import connectDB from "./config/db.js";
 import { connectCloudinary } from "./config/cloudinary.js";
 import authRoutes from "./routes/authRoutes.js";
 import photoRoutes from "./routes/photoRoutes.js";
-import packageRoutes from "./routes/photoRoutes.js";
+import packageRoutes from "./routes/packageRoutes.js";
 
 dotenv.config();
 
@@ -21,7 +21,7 @@ connectCloudinary();
 
 // Root Route
 app.get("/", (req, res) => {
-  res.send("🚀 Photography API is running");
+  res.send("Photography API is running");
 });
 
 // Routes
@@ -32,5 +32,5 @@ app.use("/api/packages", packageRoutes);
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
-  console.log(`🚀 Server is running on http://localhost:${PORT}`);
+  console.log(`Server is running on port ${PORT}`);
 });
