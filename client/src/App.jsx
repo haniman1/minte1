@@ -17,6 +17,7 @@ import AdminLogin from "./pages/AdminLogin";
 // Layout
 import Sidebar from "./components/Sidebar"; // replaces Navbar
 import Footer from "./components/Footer";
+import ScrollToTop from "./components/ScrollToTop";
 
 // One place to rename the hidden admin login page
 const ADMIN_LOGIN_PATH = "/secret-login-123";
@@ -43,6 +44,7 @@ function App() {
       <PackageProvider>
         <LanguageProvider>
           <div className="min-h-screen bg-black text-white">
+            <ScrollToTop />
             <Sidebar />
 
             {/* Content sits to the right of the sidebar on desktop,
