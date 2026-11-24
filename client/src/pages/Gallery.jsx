@@ -91,6 +91,28 @@ function getCategory(photo) {
   return photo.category?.name || photo.category || "Editorial";
 }
 
+/* ─── Small presentational helpers (no state, no logic) ─────────────────── */
+const ring =
+  "outline-none focus-visible:ring-2 focus-visible:ring-[#C9A84C] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0a0a]";
+
+function Icon({ d, size = 20 }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d={d} />
+    </svg>
+  );
+}
+
 function Gallery() {
   const [lang, setLang] = useState("en");
   const [photos, setPhotos] = useState([]);
@@ -187,38 +209,43 @@ function Gallery() {
   }, [lightboxIndex, visiblePhotos]);
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-[#0a0a0a] text-white">
+    <div className="g-root relative min-h-screen overflow-hidden bg-[#0a0a0a] text-white">
+      {/* Atmosphere: fine dot grid + warm gold glow (matches the Home page) */}
       <div className="pointer-events-none fixed inset-0 opacity-[0.035] [background-image:radial-gradient(circle_at_1px_1px,white_1px,transparent_0)] [background-size:18px_18px]" />
-      <div className="pointer-events-none fixed inset-0 bg-[radial-gradient(circle_at_top,rgba(147,197,253,0.12),transparent_32%),radial-gradient(circle_at_bottom,rgba(245,158,11,0.08),transparent_34%)]" />
+      <div className="pointer-events-none fixed inset-0 bg-[radial-gradient(ellipse_70%_40%_at_50%_0%,rgba(201,168,76,0.13),transparent_70%),radial-gradient(ellipse_60%_40%_at_50%_100%,rgba(201,168,76,0.07),transparent_70%)]" />
 
       <main className="relative z-10">
-        <header className="relative mx-auto max-w-5xl px-6 pb-6 pt-16 text-center md:pt-20">
+        {/* ── Header ───────────────────────────────────────────────── */}
+        <header className="relative mx-auto max-w-5xl px-6 pb-10 pt-24 text-center md:pb-14 md:pt-28">
           <button
             type="button"
             onClick={() => setLang(lang === "en" ? "am" : "en")}
-            className="absolute right-6 top-4 z-20 rounded-full border border-white/20 bg-black/40 px-4 py-2 text-sm text-white backdrop-blur-md transition hover:bg-black/70 focus-visible:ring-2 focus-visible:ring-white"
+            className={`absolute right-6 top-5 z-20 inline-flex min-h-11 cursor-pointer items-center rounded-full border border-white/20 bg-black/50 px-5 text-sm font-medium text-white backdrop-blur-md transition duration-300 hover:border-[#C9A84C]/60 hover:text-[#C9A84C] ${ring}`}
             aria-label="Switch language"
           >
             EN / አማ
           </button>
 
           <div className="animate-[fadeUp_700ms_ease-out_both] motion-reduce:animate-none">
-            <p className="text-xs font-medium uppercase tracking-[0.38em] text-neutral-500">
+            <p className="flex items-center justify-center gap-4 text-xs font-medium uppercase tracking-[0.34em] text-[#C9A84C]">
+              <span aria-hidden="true" className="h-px w-8 bg-gradient-to-r from-transparent to-[#C9A84C]/70" />
               {t.studioArchive}
+              <span aria-hidden="true" className="h-px w-8 bg-gradient-to-l from-transparent to-[#C9A84C]/70" />
             </p>
 
-            <h1 className="mt-3 text-4xl font-black tracking-[-0.05em] md:text-6xl">
+            <h1 className="g-serif mt-5 text-6xl font-semibold leading-none tracking-[-0.03em] md:text-8xl">
               {t.gallery}
             </h1>
 
-            <p className="mx-auto mt-3 max-w-xl text-sm leading-7 text-neutral-400 md:text-base">
+            <p className="mx-auto mt-6 max-w-xl text-base leading-8 text-neutral-300 md:text-lg">
               {t.galleryDesc}
             </p>
           </div>
         </header>
 
-        <section className="sticky top-0 z-30 border-y border-white/10 bg-[#0a0a0a]/80 px-6 py-4 backdrop-blur-md">
-          <div className="mx-auto flex max-w-7xl gap-3 overflow-x-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        {/* ── Category filter ──────────────────────────────────────── */}
+        <section className="sticky top-0 z-30 border-y border-white/10 bg-[#0a0a0a]/85 px-6 py-3 backdrop-blur-md">
+          <div className="mx-auto flex max-w-7xl gap-2 overflow-x-auto md:justify-center [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {categories.map((category) => {
               const active = selectedCategory === category;
 
@@ -228,17 +255,18 @@ function Gallery() {
                   type="button"
                   onClick={() => setSelectedCategory(category)}
                   aria-pressed={active}
-                  className={`relative shrink-0 rounded-full px-5 py-2.5 text-sm font-medium transition duration-300 focus-visible:ring-2 focus-visible:ring-white ${
+                  className={`relative inline-flex min-h-11 shrink-0 cursor-pointer items-center rounded-full px-5 text-sm font-medium transition duration-300 ${ring} ${
                     active
-                      ? "text-white"
-                      : "text-neutral-500 hover:text-neutral-200"
+                      ? "text-[#C9A84C]"
+                      : "text-neutral-400 hover:text-white"
                   }`}
                 >
                   {t.categories[category]}
                   <span
-                    className={`absolute inset-x-5 -bottom-0.5 h-px rounded-full bg-white transition duration-300 ${
+                    aria-hidden="true"
+                    className={`absolute inset-x-5 bottom-1 h-px rounded-full bg-[#C9A84C] transition duration-300 ${
                       active
-                        ? "opacity-100 shadow-[0_0_18px_rgba(255,255,255,0.65)]"
+                        ? "opacity-100 shadow-[0_0_14px_rgba(201,168,76,0.8)]"
                         : "opacity-0"
                     }`}
                   />
@@ -248,33 +276,37 @@ function Gallery() {
           </div>
         </section>
 
-        <section className="mx-auto max-w-7xl px-6 py-10">
+        {/* ── Photo grid ───────────────────────────────────────────── */}
+        <section className="mx-auto max-w-7xl px-6 py-12 md:py-16">
           {loading ? (
-            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="columns-1 gap-5 sm:columns-2 lg:columns-3" aria-busy="true">
               {Array.from({ length: 9 }).map((_, index) => (
                 <div
                   key={index}
-                  className={`rounded-[1.5rem] bg-neutral-900 ${
+                  className={`mb-5 break-inside-avoid rounded-[1.5rem] bg-neutral-900 ${
                     heightPattern[index % heightPattern.length]
                   } animate-pulse`}
                 />
               ))}
             </div>
           ) : visiblePhotos.length === 0 ? (
-            <div className="rounded-[2rem] border border-white/10 bg-white/[0.03] px-6 py-20 text-center">
-              <p className="text-lg text-neutral-400">{t.noPhotos}</p>
+            <div className="flex flex-col items-center gap-5 rounded-[2rem] border border-white/10 bg-white/[0.03] px-6 py-24 text-center">
+              <span className="flex h-14 w-14 items-center justify-center rounded-full border border-[#C9A84C]/40 bg-[#C9A84C]/10 text-[#C9A84C]">
+                <Icon d="M3 7a2 2 0 0 1 2-2h2l1.5-2h7L17 5h2a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7zM12 17a4 4 0 1 0 0-8 4 4 0 0 0 0 8z" size={24} />
+              </span>
+              <p className="text-lg text-neutral-300">{t.noPhotos}</p>
             </div>
           ) : (
             <div
               key={selectedCategory}
-              className="grid animate-[fadeUp_450ms_ease-out_both] grid-cols-1 items-start gap-5 motion-reduce:animate-none sm:grid-cols-2 lg:grid-cols-3"
+              className="animate-[fadeUp_450ms_ease-out_both] columns-1 gap-5 motion-reduce:animate-none sm:columns-2 lg:columns-3"
             >
               {visiblePhotos.map((photo, index) => (
                 <button
                   key={photo._id || photo.id || `${photo.title}-${index}`}
                   type="button"
                   onClick={() => setLightboxIndex(index)}
-                  className={`group relative w-full cursor-zoom-in overflow-hidden rounded-[1.5rem] bg-neutral-900 text-left outline-none transition duration-300 hover:shadow-2xl hover:shadow-black/50 focus-visible:ring-2 focus-visible:ring-white ${
+                  className={`group relative mb-5 block w-full cursor-zoom-in break-inside-avoid overflow-hidden rounded-[1.5rem] border border-white/[0.08] bg-neutral-900 text-left transition duration-500 hover:-translate-y-1 hover:border-[#C9A84C]/50 hover:shadow-2xl hover:shadow-black/60 motion-reduce:transition-none motion-reduce:hover:translate-y-0 ${ring} ${
                     heightPattern[index % heightPattern.length]
                   }`}
                 >
@@ -282,37 +314,53 @@ function Gallery() {
                     src={getImageUrl(photo)}
                     alt={photo.title || "Gallery photograph"}
                     loading="lazy"
-                    className="h-full w-full object-cover transition duration-500 ease-out group-hover:scale-110 motion-reduce:transition-none"
+                    decoding="async"
+                    className="h-full w-full object-cover transition duration-700 ease-out group-hover:scale-[1.07] group-focus-visible:scale-[1.07] motion-reduce:transition-none"
                   />
 
-                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_20%,rgba(0,0,0,0.28)_100%)]" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/15 to-transparent opacity-0 transition duration-300 group-hover:opacity-100 group-focus-visible:opacity-100 [@media(hover:none)]:opacity-100" />
+                  {/* Scrim stays on so the title is readable on touch screens too */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/10 to-transparent opacity-80 transition duration-300 group-hover:opacity-100" />
+                  <div className="absolute inset-0 bg-gradient-to-br from-[#C9A84C]/10 to-transparent opacity-0 transition duration-300 group-hover:opacity-100" />
 
-                  <div className="absolute left-5 top-5 translate-y-2 opacity-0 transition duration-300 group-hover:translate-y-0 group-hover:opacity-100 group-focus-visible:translate-y-0 group-focus-visible:opacity-100 [@media(hover:none)]:translate-y-0 [@media(hover:none)]:opacity-100">
-                    <span className="rounded-full border border-white/15 bg-black/40 px-3 py-1 text-xs font-medium uppercase tracking-[0.18em] text-white backdrop-blur-md">
-                      {getCategory(photo)}
-                    </span>
-                  </div>
+                  <span className="absolute left-4 top-4 rounded-full border border-white/20 bg-black/55 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-white backdrop-blur-md">
+                    {getCategory(photo)}
+                  </span>
 
-                  <div className="absolute inset-x-0 bottom-0 translate-y-4 p-6 opacity-0 transition duration-300 group-hover:translate-y-0 group-hover:opacity-100 group-focus-visible:translate-y-0 group-focus-visible:opacity-100 [@media(hover:none)]:translate-y-0 [@media(hover:none)]:opacity-100">
-                    <h2 className="text-2xl font-semibold tracking-tight">
+                  <span
+                    aria-hidden="true"
+                    className="absolute right-4 top-4 flex h-9 w-9 scale-75 items-center justify-center rounded-full border border-[#C9A84C]/50 bg-[#C9A84C]/15 text-[#C9A84C] opacity-0 transition duration-300 group-hover:scale-100 group-hover:opacity-100 group-focus-visible:scale-100 group-focus-visible:opacity-100"
+                  >
+                    <Icon d="M7 17L17 7M17 7H8M17 7v9" size={14} />
+                  </span>
+
+                  <div className="absolute inset-x-0 bottom-0 p-6">
+                    <h2 className="g-serif text-2xl font-semibold leading-tight tracking-tight text-white md:text-[1.75rem]">
                       {photo.title || t.untitled}
                     </h2>
-                    <p className="mt-2 text-sm text-neutral-300">
+                    <p className="mt-2 flex items-center gap-2 text-xs font-medium uppercase tracking-[0.18em] text-[#C9A84C] transition duration-300 group-hover:translate-x-1">
                       {t.openImage}
+                      <Icon d="M5 12h14M13 6l6 6-6 6" size={14} />
                     </p>
                   </div>
+
+                  <span
+                    aria-hidden="true"
+                    className="absolute bottom-0 left-0 h-0.5 w-0 bg-gradient-to-r from-[#C9A84C] to-[#C9A84C]/30 transition-all duration-500 group-hover:w-full group-focus-visible:w-full"
+                  />
                 </button>
               ))}
             </div>
           )}
 
           {!loading && visibleCount < filteredPhotos.length && (
-            <div className="mt-10 flex justify-center">
+            <div className="mt-6 flex flex-col items-center gap-4">
+              <p className="text-sm tabular-nums text-neutral-400">
+                {visiblePhotos.length} / {filteredPhotos.length}
+              </p>
               <button
                 type="button"
                 onClick={() => setVisibleCount((count) => count + 9)}
-                className="rounded-full border border-white/15 bg-white/10 px-7 py-3 text-sm font-bold uppercase tracking-[0.18em] text-white transition duration-300 hover:bg-white hover:text-black focus-visible:ring-2 focus-visible:ring-white"
+                className={`inline-flex min-h-12 cursor-pointer items-center rounded-full border border-[#C9A84C]/60 bg-[#C9A84C]/10 px-8 text-sm font-bold uppercase tracking-[0.18em] text-[#C9A84C] transition duration-300 hover:bg-[#C9A84C] hover:text-black hover:shadow-[0_0_40px_rgba(201,168,76,0.35)] ${ring}`}
               >
                 {t.loadMore}
               </button>
@@ -320,21 +368,25 @@ function Gallery() {
           )}
         </section>
 
+        {/* ── Featured banner ──────────────────────────────────────── */}
         {visiblePhotos.length > 2 && (
-          <section className="relative mx-auto mb-20 max-w-7xl px-6">
-            <div className="relative h-[70vh] overflow-hidden rounded-[2rem]">
+          <section className="relative mx-auto mb-24 max-w-7xl px-6">
+            <div className="relative h-[70vh] min-h-[420px] overflow-hidden rounded-[2rem] border border-white/10">
               <img
                 src={getImageUrl(visiblePhotos[1])}
                 alt={visiblePhotos[1].title || t.featuredWork}
                 loading="lazy"
+                decoding="async"
                 className="h-full w-full object-cover"
               />
-              <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/30 to-transparent" />
-              <div className="absolute bottom-8 left-6 max-w-xl md:bottom-12 md:left-12">
-                <p className="text-sm uppercase tracking-[0.32em] text-neutral-300">
+              <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/40 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+              <div className="absolute bottom-8 left-6 right-6 max-w-xl md:bottom-14 md:left-14">
+                <p className="flex items-center gap-4 text-xs font-medium uppercase tracking-[0.32em] text-[#C9A84C]">
+                  <span aria-hidden="true" className="h-px w-8 bg-[#C9A84C]/70" />
                   {t.featuredWork}
                 </p>
-                <h2 className="mt-4 text-4xl font-semibold tracking-tight md:text-6xl">
+                <h2 className="g-serif mt-4 text-4xl font-semibold leading-[1.05] tracking-tight md:text-6xl">
                   {visiblePhotos[1].title || t.featuredFallback}
                 </h2>
               </div>
@@ -343,9 +395,10 @@ function Gallery() {
         )}
       </main>
 
+      {/* ── Lightbox ───────────────────────────────────────────────── */}
       {activePhoto && (
         <div
-          className="fixed inset-0 z-50 flex animate-[fadeIn_220ms_ease-out_both] items-center justify-center bg-black/85 p-4 backdrop-blur-lg motion-reduce:animate-none"
+          className="fixed inset-0 z-50 flex animate-[fadeIn_220ms_ease-out_both] items-center justify-center bg-black/90 p-4 backdrop-blur-lg motion-reduce:animate-none"
           onClick={() => setLightboxIndex(null)}
           role="dialog"
           aria-modal="true"
@@ -353,14 +406,15 @@ function Gallery() {
         >
           <button
             type="button"
+            autoFocus
             onClick={(event) => {
               event.stopPropagation();
               setLightboxIndex(null);
             }}
-            className="absolute right-5 top-5 z-20 flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-2xl text-white backdrop-blur-md transition hover:bg-white hover:text-black focus-visible:ring-2 focus-visible:ring-white"
+            className={`absolute right-4 top-4 z-20 flex h-12 w-12 cursor-pointer items-center justify-center rounded-full border border-white/15 bg-white/10 text-white backdrop-blur-md transition hover:bg-[#C9A84C] hover:text-black md:right-8 md:top-8 ${ring}`}
             aria-label={t.close}
           >
-            ×
+            <Icon d="M6 6l12 12M18 6L6 18" />
           </button>
 
           {visiblePhotos.length > 1 && (
@@ -371,10 +425,10 @@ function Gallery() {
                   event.stopPropagation();
                   goToPrevious();
                 }}
-                className="absolute left-4 top-1/2 z-20 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-white/10 text-3xl text-white backdrop-blur-md transition hover:bg-white hover:text-black focus-visible:ring-2 focus-visible:ring-white md:left-8"
+                className={`absolute left-3 top-1/2 z-20 flex h-12 w-12 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border border-white/15 bg-white/10 text-white backdrop-blur-md transition hover:bg-[#C9A84C] hover:text-black md:left-8 ${ring}`}
                 aria-label={t.previous}
               >
-                ‹
+                <Icon d="M15 5l-7 7 7 7" size={22} />
               </button>
 
               <button
@@ -383,35 +437,35 @@ function Gallery() {
                   event.stopPropagation();
                   goToNext();
                 }}
-                className="absolute right-4 top-1/2 z-20 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-white/10 text-3xl text-white backdrop-blur-md transition hover:bg-white hover:text-black focus-visible:ring-2 focus-visible:ring-white md:right-8"
+                className={`absolute right-3 top-1/2 z-20 flex h-12 w-12 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border border-white/15 bg-white/10 text-white backdrop-blur-md transition hover:bg-[#C9A84C] hover:text-black md:right-8 ${ring}`}
                 aria-label={t.next}
               >
-                ›
+                <Icon d="M9 5l7 7-7 7" size={22} />
               </button>
             </>
           )}
 
           <div
-            className="relative max-h-[88vh] w-full max-w-6xl animate-[lightboxIn_260ms_ease-out_both] motion-reduce:animate-none"
+            className="relative max-h-[90vh] w-full max-w-6xl animate-[lightboxIn_260ms_ease-out_both] motion-reduce:animate-none"
             onClick={(event) => event.stopPropagation()}
           >
             <img
               src={getImageUrl(activePhoto)}
               alt={activePhoto.title || "Gallery photograph"}
-              className="mx-auto max-h-[78vh] w-full rounded-[1.5rem] object-contain shadow-2xl shadow-black/70"
+              className="mx-auto max-h-[76vh] w-full rounded-[1.5rem] object-contain shadow-2xl shadow-black/70"
             />
 
-            <div className="mt-4 flex flex-col gap-3 rounded-[1.25rem] border border-white/10 bg-black/50 p-4 backdrop-blur-md sm:flex-row sm:items-center sm:justify-between">
+            <div className="mt-4 flex flex-col gap-3 rounded-[1.25rem] border border-white/10 bg-black/60 p-4 backdrop-blur-md sm:flex-row sm:items-center sm:justify-between sm:px-6">
               <div>
-                <h2 className="text-xl font-semibold text-white">
+                <h2 className="g-serif text-2xl font-semibold text-white">
                   {activePhoto.title || t.untitled}
                 </h2>
-                <p className="mt-1 text-sm text-neutral-400">
+                <p className="mt-1 text-sm tabular-nums text-neutral-400">
                   {lightboxIndex + 1} / {visiblePhotos.length}
                 </p>
               </div>
 
-              <span className="w-max rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs font-medium uppercase tracking-[0.18em] text-white">
+              <span className="w-max rounded-full border border-[#C9A84C]/40 bg-[#C9A84C]/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-[#C9A84C]">
                 {getCategory(activePhoto)}
               </span>
             </div>
@@ -420,6 +474,12 @@ function Gallery() {
       )}
 
       <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Inter:wght@300;400;500;600;700&family=Noto+Serif+Ethiopic:wght@400;600;700&family=Noto+Sans+Ethiopic:wght@400;500;600&display=swap');
+
+        .g-root { font-family: 'Inter', 'Noto Sans Ethiopic', system-ui, sans-serif; }
+        .g-serif { font-family: 'Cormorant Garamond', 'Noto Serif Ethiopic', Georgia, serif; }
+        .g-root ::selection { background: rgba(201,168,76,0.35); color: #fff; }
+
         @keyframes fadeUp {
           from { opacity: 0; transform: translateY(24px); }
           to { opacity: 1; transform: translateY(0); }
@@ -433,6 +493,14 @@ function Gallery() {
         @keyframes lightboxIn {
           from { opacity: 0; transform: scale(0.96) translateY(12px); }
           to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          .g-root *, .g-root *::before, .g-root *::after {
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: 0.01ms !important;
+          }
         }
       `}</style>
     </div>
