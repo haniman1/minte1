@@ -153,7 +153,7 @@ const Contact = () => {
               <InfoBlock icon={<MapPinIcon />} label="Studio">
                 <div>
                   <p className="c-serif text-3xl font-semibold tracking-tight">
-                    New York, NY
+                    Jimma 
                   </p>
                   <p className="mt-1 text-sm text-neutral-300">
                     Available for travel worldwide
@@ -204,16 +204,16 @@ const Contact = () => {
                   Follow
                 </span>
                 <div className="flex gap-3">
-                  <SocialBtn href="https://instagram.com" label="Instagram">
+                  <SocialBtn href="https://www.instagram.com/minte_gett/" label="Instagram">
                     <InstagramIcon />
                   </SocialBtn>
-                  <SocialBtn href="https://www.tiktok.com/en/" label="TikTok">
+                  <SocialBtn href="https://www.tiktok.com/@mintesinot_g" label="TikTok">
                     <TikTokIcon />
                   </SocialBtn>
-                  <SocialBtn href="https://facebook.com" label="Facebook">
+                  <SocialBtn href="https://web.facebook.com/groups/1183400838772325/?_rdc=1&_rdr#" label="Facebook">
                     <FacebookIcon />
                   </SocialBtn>
-                  <SocialBtn href="https://web.telegram.org/" label="Telegram">
+                  <SocialBtn href="https://t.me/TechStudio_WithMinte" label="Telegram">
                     <TelegramIcon />
                   </SocialBtn>
                 </div>
