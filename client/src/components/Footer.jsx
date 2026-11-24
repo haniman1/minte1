@@ -1,25 +1,25 @@
 import { useRef } from "react";
 import { Link } from "react-router-dom";
-import { motion, useInView } from "framer-motion";
+import { motion, useInView, MotionConfig } from "framer-motion";
 
-const G = "#D4AF37",
-  B = "rgba(255,255,255,0.07)",
-  R = "rgba(255,255,255,0.03)",
-  S = "#0D0D0D";
+const G = "#C9A84C";
 const sp = { type: "spring", stiffness: 400, damping: 20 };
 const YEAR = new Date().getFullYear();
 
+const ring =
+  "outline-none focus-visible:ring-2 focus-visible:ring-[#C9A84C] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0D0D0D]";
+
 /* ─── Social links — change addresses here only ─────────────────────────── */
 const iconProps = {
-  width: 26,
-  height: 26,
+  width: 24,
+  height: 24,
   viewBox: "0 0 24 24",
   "aria-hidden": "true",
 };
 const strokeProps = {
   fill: "none",
   stroke: "currentColor",
-  strokeWidth: 2.5,
+  strokeWidth: 2.2,
   strokeLinecap: "round",
   strokeLinejoin: "round",
 };
@@ -93,43 +93,7 @@ function SocialBtn({ href, label, children }) {
       whileHover={{ scale: 1.12, y: -4 }}
       whileTap={{ scale: 0.96 }}
       transition={sp}
-      style={{
-        width: 60,
-        height: 60,
-        borderRadius: "50%",
-        border: `1px solid ${B}`,
-        background: R,
-        backdropFilter: "blur(12px)",
-        WebkitBackdropFilter: "blur(12px)",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        color: "#888",
-        textDecoration: "none",
-        flexShrink: 0,
-        cursor: "pointer",
-        position: "relative",
-        overflow: "hidden",
-        transition:
-          "border-color .3s ease,color .3s ease,box-shadow .3s ease,background .3s ease",
-      }}
-      onMouseEnter={(e) =>
-        Object.assign(e.currentTarget.style, {
-          borderColor: G,
-          color: G,
-          background: "rgba(255,255,255,0.08)",
-          boxShadow:
-            "0 0 25px rgba(212,175,55,0.25), inset 0 0 20px rgba(255,255,255,0.04)",
-        })
-      }
-      onMouseLeave={(e) =>
-        Object.assign(e.currentTarget.style, {
-          borderColor: B,
-          color: "#888",
-          background: R,
-          boxShadow: "none",
-        })
-      }
+      className={`flex h-14 w-14 shrink-0 cursor-pointer items-center justify-center rounded-full border border-white/10 bg-white/[0.04] text-neutral-300 no-underline backdrop-blur-md transition-[border-color,color,box-shadow,background] duration-300 hover:border-[#C9A84C] hover:bg-[#C9A84C]/10 hover:text-[#C9A84C] hover:shadow-[0_0_28px_rgba(201,168,76,0.28)] ${ring}`}
     >
       {children}
     </motion.a>
@@ -137,44 +101,22 @@ function SocialBtn({ href, label, children }) {
 }
 
 function NavLink({ to, href, children }) {
-  const s = {
-    color: "#8a8a8a",
-    textDecoration: "none",
-    fontSize: 13,
-    letterSpacing: "0.02em",
-    display: "inline-block",
-    position: "relative",
-    transition: "color 0.3s",
-    paddingBottom: 2,
-  };
+  const cls = `ft-link group/link relative inline-flex min-h-11 items-center text-sm tracking-wide text-neutral-300 no-underline transition-colors duration-300 hover:text-white focus-visible:text-white ${ring} rounded-sm`;
   const inner = (
     <>
       {children}
       <span
-        className="nav-underline"
-        style={{
-          position: "absolute",
-          bottom: 0,
-          left: 0,
-          width: "0%",
-          height: "1px",
-          background: G,
-          transition: "width 0.35s ease",
-        }}
+        aria-hidden="true"
+        className="absolute bottom-2 left-0 h-px w-0 bg-[#C9A84C] transition-[width] duration-300 group-hover/link:w-full group-focus-visible/link:w-full"
       />
     </>
   );
-  const p = {
-    style: s,
-    onMouseEnter: (e) => (e.currentTarget.style.color = "#fff"),
-    onMouseLeave: (e) => (e.currentTarget.style.color = "#8a8a8a"),
-  };
   return to ? (
-    <Link to={to} {...p}>
+    <Link to={to} className={cls}>
       {inner}
     </Link>
   ) : (
-    <a href={href} {...p}>
+    <a href={href} className={cls}>
       {inner}
     </a>
   );
@@ -188,43 +130,15 @@ function CtaButton({ children, variant = "primary", to = "/" }) {
       whileHover={{ y: -2 }}
       whileTap={{ scale: 0.97 }}
       transition={{ type: "spring", stiffness: 400, damping: 25 }}
-      style={{ flexShrink: 0 }}
+      className="shrink-0"
     >
       <Link
         to={to}
-        style={{
-          display: "inline-flex",
-          alignItems: "center",
-          gap: 10,
-          padding: "13px 28px",
-          fontSize: 12,
-          fontWeight: 600,
-          letterSpacing: "0.14em",
-          textTransform: "uppercase",
-          textDecoration: "none",
-          borderRadius: 0,
-          cursor: "pointer",
-          transition: "all 0.3s ease",
-          background: p ? G : "transparent",
-          color: p ? "#000" : G,
-          border: p ? "none" : "1px solid rgba(212,175,55,0.4)",
-        }}
-        onMouseEnter={(e) =>
+        className={`inline-flex min-h-12 cursor-pointer items-center justify-center gap-2 rounded-full px-7 text-xs font-bold uppercase tracking-[0.14em] no-underline transition duration-300 ${ring} ${
           p
-            ? (e.currentTarget.style.background = "#F0C830")
-            : Object.assign(e.currentTarget.style, {
-                borderColor: G,
-                background: "rgba(212,175,55,0.06)",
-              })
-        }
-        onMouseLeave={(e) =>
-          p
-            ? (e.currentTarget.style.background = G)
-            : Object.assign(e.currentTarget.style, {
-                borderColor: "rgba(212,175,55,0.4)",
-                background: "transparent",
-              })
-        }
+            ? "bg-[#C9A84C] text-black shadow-[0_0_32px_rgba(201,168,76,0.25)] hover:bg-[#DFC060] hover:shadow-[0_0_48px_rgba(201,168,76,0.4)]"
+            : "border border-[#C9A84C]/50 bg-transparent text-[#C9A84C] hover:border-[#C9A84C] hover:bg-[#C9A84C]/10"
+        }`}
       >
         {children}
       </Link>
@@ -248,42 +162,14 @@ const COMPANY = [
 
 function NavCard({ title, items }) {
   return (
-    <div
-      style={{
-        background: R,
-        border: `1px solid ${B}`,
-        borderRadius: 16,
-        padding: "28px",
-      }}
-    >
-      <p
-        style={{
-          fontSize: 10,
-          letterSpacing: "0.28em",
-          textTransform: "uppercase",
-          color: G,
-          marginBottom: 20,
-          fontWeight: 500,
-        }}
-      >
+    <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-7 transition-colors duration-300 hover:border-[#C9A84C]/30">
+      <p className="mb-4 flex items-center gap-3 text-xs font-medium uppercase tracking-[0.26em] text-[#C9A84C]">
+        <span aria-hidden="true" className="h-px w-5 bg-[#C9A84C]/70" />
         {title}
       </p>
-      <ul
-        style={{
-          listStyle: "none",
-          padding: 0,
-          margin: 0,
-          display: "flex",
-          flexDirection: "column",
-          gap: 14,
-        }}
-      >
+      <ul className="m-0 flex list-none flex-col p-0">
         {items.map(({ label, to, href, name }) => (
-          <li
-            key={label ?? name}
-            className="nav-link-wrap"
-            style={{ position: "relative" }}
-          >
+          <li key={label ?? name} className="relative">
             <NavLink to={to} href={href}>
               {label ?? name}
             </NavLink>
@@ -296,97 +182,43 @@ function NavCard({ title, items }) {
 
 /* ─── Footer ─────────────────────────────────────────────────────────────── */
 const Footer = () => (
-  <>
+  <MotionConfig reducedMotion="user">
     <style>{`
-      @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,400&family=Inter:wght@300;400;500;600&display=swap');
-      .nav-link-wrap:hover .nav-underline{width:100%!important}
-      @media(max-width:768px){.fp{padding:40px 24px 36px!important}.fbg{flex-direction:column!important;gap:32px!important}.fng{grid-template-columns:1fr 1fr!important}.fci{flex-direction:column!important;align-items:flex-start!important;gap:20px!important}.fcb{flex-wrap:wrap!important}.fbt{flex-direction:column!important;text-align:center!important;gap:8px!important}.fpi{margin:0 24px!important;padding:32px 24px!important}}
-      @media(prefers-reduced-motion:reduce){.site-footer,.site-footer *{animation:none!important;transition:none!important}}
+      @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,400;1,600&family=Inter:wght@300;400;500;600;700&display=swap');
+      .ft-root { font-family: 'Inter', system-ui, sans-serif; }
+      .ft-serif { font-family: 'Cormorant Garamond', Georgia, serif; }
+      .ft-root ::selection { background: rgba(201,168,76,0.35); color: #fff; }
+      @media (prefers-reduced-motion: reduce) {
+        .ft-root, .ft-root * { animation: none !important; transition-duration: 0.01ms !important; }
+      }
     `}</style>
 
-    <div
-      className="site-footer"
-      style={{
-        backgroundColor: "#000",
-        paddingTop: 80,
-        paddingLeft: 16,
-        paddingRight: 16,
-      }}
-    >
-      <footer
-        style={{
-          backgroundColor: S,
-          width: "100%",
-          maxWidth: 1350,
-          margin: "0 auto",
-          color: "#fff",
-          fontFamily: "'Inter',sans-serif",
-          borderRadius: "24px 24px 0 0",
-          overflow: "hidden",
-          position: "relative",
-        }}
-      >
+    <div className="ft-root bg-black px-4 pt-20">
+      <footer className="relative mx-auto w-full max-w-[1350px] overflow-hidden rounded-t-3xl bg-[#0D0D0D] text-white">
+        {/* Film grain */}
         <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 z-0 opacity-40"
           style={{
-            position: "absolute",
-            inset: 0,
-            opacity: 0.4,
-            pointerEvents: "none",
-            zIndex: 0,
             backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E")`,
           }}
         />
+        {/* Gold glow */}
         <div
-          style={{
-            position: "absolute",
-            top: -80,
-            left: "50%",
-            transform: "translateX(-50%)",
-            width: 600,
-            height: 300,
-            pointerEvents: "none",
-            zIndex: 0,
-            background:
-              "radial-gradient(ellipse,rgba(212,175,55,0.06) 0%,transparent 70%)",
-          }}
+          aria-hidden="true"
+          className="pointer-events-none absolute -top-20 left-1/2 z-0 h-[300px] w-[600px] max-w-full -translate-x-1/2 bg-[radial-gradient(ellipse,rgba(201,168,76,0.09)_0%,transparent_70%)]"
         />
 
-        <div style={{ position: "relative", zIndex: 1 }}>
+        <div className="relative z-10">
           {/* Brand */}
-          <div
-            className="fp"
-            style={{
-              padding: "56px 48px 48px",
-              borderBottom: `1px solid ${B}`,
-            }}
-          >
+          <div className="border-b border-white/10 px-6 pb-10 pt-12 md:px-12 md:pb-12 md:pt-14">
             <FadeUp>
-              <div
-                className="fbg"
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "flex-start",
-                  gap: 48,
-                }}
-              >
-                <div
-                  style={{
-                    background: "rgba(255,255,255,0.025)",
-                    border: `1px solid ${B}`,
-                    backdropFilter: "blur(20px)",
-                    WebkitBackdropFilter: "blur(20px)",
-                    borderRadius: 20,
-                    padding: "36px 40px",
-                    maxWidth: 420,
-                    width: "100%",
-                    flexShrink: 0,
-                  }}
-                >
+              <div className="flex flex-col items-start justify-between gap-10 md:flex-row md:gap-12">
+                <div className="w-full max-w-[440px] shrink-0 rounded-3xl border border-white/10 bg-white/[0.025] p-8 backdrop-blur-xl md:p-10">
                   <Link
                     to="/"
                     aria-label="Tech Photography — Home"
-                    style={{ display: "inline-block", marginBottom: 24 }}
+                    className={`mb-6 inline-flex items-center gap-4 rounded-md no-underline ${ring}`}
                   >
                     <motion.div
                       whileHover={{ rotate: 45, scale: 1.1 }}
@@ -406,39 +238,21 @@ const Footer = () => (
                           [16.001, 27.294],
                           [27.294, 16],
                         ].map(([cx, cy], i) => (
-                          <circle
-                            key={i}
-                            cx={cx}
-                            cy={cy}
-                            r="4.706"
-                            fill="#D9D9D9"
-                          />
+                          <circle key={i} cx={cx} cy={cy} r="4.706" fill={G} />
                         ))}
                       </svg>
                     </motion.div>
+                    <span className="text-xs font-bold uppercase tracking-[0.2em]">
+                      <span className="text-white">TECH</span>{" "}
+                      <span className="text-[#C9A84C]">PHOTOGRAPHY</span>
+                    </span>
                   </Link>
-                  <p
-                    style={{
-                      fontFamily: "'Playfair Display',Georgia,serif",
-                      fontSize: "clamp(18px,2vw,22px)",
-                      fontStyle: "italic",
-                      color: "#fff",
-                      lineHeight: 1.5,
-                      marginBottom: 16,
-                      letterSpacing: "-0.01em",
-                    }}
-                  >
+
+                  <p className="ft-serif mb-4 text-2xl italic leading-snug tracking-tight text-white md:text-[1.7rem]">
                     Capturing timeless stories through light, emotion and
                     atmosphere.
                   </p>
-                  <p
-                    style={{
-                      fontSize: 13,
-                      color: "#555",
-                      lineHeight: 1.7,
-                      maxWidth: 300,
-                    }}
-                  >
+                  <p className="max-w-xs text-sm leading-7 text-neutral-400">
                     Specializing in weddings, portraits, and events — wherever
                     the story takes us.
                   </p>
@@ -451,28 +265,15 @@ const Footer = () => (
                       ease: [0.22, 1, 0.36, 1],
                       delay: 0.3,
                     }}
-                    style={{
-                      height: 1,
-                      background: `linear-gradient(to right,${G},transparent)`,
-                      transformOrigin: "left",
-                      marginTop: 28,
-                    }}
+                    className="mt-7 h-px origin-left bg-gradient-to-r from-[#C9A84C] to-transparent"
                   />
                 </div>
 
-                <div style={{ paddingTop: 8 }}>
-                  <p
-                    style={{
-                      fontSize: 11,
-                      letterSpacing: "0.3em",
-                      textTransform: "uppercase",
-                      color: "#777",
-                      marginBottom: 12,
-                    }}
-                  >
+                <div className="pt-2">
+                  <p className="mb-4 text-xs font-medium uppercase tracking-[0.28em] text-neutral-400">
                     Follow the work
                   </p>
-                  <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+                  <div className="flex flex-wrap gap-3">
                     {SOCIALS.map(({ label, href, icon }) => (
                       <SocialBtn key={label} href={href} label={label}>
                         {icon}
@@ -485,19 +286,9 @@ const Footer = () => (
           </div>
 
           {/* Nav grid */}
-          <div
-            className="fp"
-            style={{ padding: "48px", borderBottom: `1px solid ${B}` }}
-          >
+          <div className="border-b border-white/10 px-6 py-10 md:px-12 md:py-12">
             <FadeUp delay={0.05}>
-              <div
-                className="fng"
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "repeat(3,1fr)",
-                  gap: "40px 32px",
-                }}
-              >
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-3 sm:gap-8">
                 <NavCard title="Navigate" items={NAV_LINKS} />
                 <NavCard
                   title="Services"
@@ -510,88 +301,26 @@ const Footer = () => (
 
           {/* CTA */}
           <FadeUp delay={0.1}>
-            <div
-              className="fpi"
-              style={{
-                margin: "48px 48px 0",
-                background:
-                  "linear-gradient(135deg,rgba(212,175,55,0.06) 0%,rgba(255,255,255,0.02) 50%,rgba(212,175,55,0.04) 100%)",
-                border: "1px solid rgba(212,175,55,0.15)",
-                borderRadius: 20,
-                padding: "44px 48px",
-                position: "relative",
-                overflow: "hidden",
-              }}
-            >
+            <div className="relative mx-6 mt-10 overflow-hidden rounded-3xl border border-[#C9A84C]/25 bg-gradient-to-br from-[#C9A84C]/[0.09] via-white/[0.02] to-[#C9A84C]/[0.05] px-7 py-10 md:mx-12 md:px-12 md:py-12">
               <div
-                style={{
-                  position: "absolute",
-                  top: -40,
-                  right: -40,
-                  width: 200,
-                  height: 200,
-                  background:
-                    "radial-gradient(circle,rgba(212,175,55,0.12) 0%,transparent 70%)",
-                  pointerEvents: "none",
-                }}
+                aria-hidden="true"
+                className="pointer-events-none absolute -right-10 -top-10 h-52 w-52 bg-[radial-gradient(circle,rgba(201,168,76,0.16)_0%,transparent_70%)]"
               />
-              <div
-                className="fci"
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  gap: 32,
-                  position: "relative",
-                }}
-              >
-                <div style={{ flex: 1 }}>
-                  <p
-                    style={{
-                      fontSize: 11,
-                      letterSpacing: "0.28em",
-                      textTransform: "uppercase",
-                      color: G,
-                      marginBottom: 12,
-                      fontWeight: 500,
-                    }}
-                  >
+              <div className="relative flex flex-col items-start justify-between gap-8 lg:flex-row lg:items-center">
+                <div className="flex-1">
+                  <p className="mb-3 flex items-center gap-3 text-xs font-medium uppercase tracking-[0.26em] text-[#C9A84C]">
+                    <span aria-hidden="true" className="h-px w-6 bg-[#C9A84C]/70" />
                     Let's work together
                   </p>
-                  <h3
-                    style={{
-                      fontFamily: "'Playfair Display',Georgia,serif",
-                      fontSize: "clamp(22px,3vw,34px)",
-                      fontWeight: 700,
-                      letterSpacing: "-0.02em",
-                      color: "#fff",
-                      marginBottom: 10,
-                      lineHeight: 1.25,
-                    }}
-                  >
+                  <h3 className="ft-serif mb-3 text-3xl font-semibold leading-[1.1] tracking-tight text-white md:text-5xl">
                     Ready to create something timeless?
                   </h3>
-                  <p
-                    style={{
-                      fontSize: 13,
-                      color: "#555",
-                      lineHeight: 1.7,
-                      maxWidth: 460,
-                    }}
-                  >
+                  <p className="max-w-lg text-sm leading-7 text-neutral-300">
                     Available for weddings, portraits, destination sessions and
                     private events worldwide.
                   </p>
                 </div>
-                <div
-                  className="fcb"
-                  style={{
-                    display: "flex",
-                    gap: 12,
-                    flexShrink: 0,
-                    alignItems: "center",
-                  }}
-                >
+                <div className="flex shrink-0 flex-wrap items-center gap-3">
                   <CtaButton to="/packages">Book a Session →</CtaButton>
                   <CtaButton to="/gallery" variant="outline">
                     View Gallery →
@@ -602,34 +331,18 @@ const Footer = () => (
           </FadeUp>
 
           {/* Copyright */}
-          <div
-            className="fp fbt"
-            style={{
-              borderTop: `1px solid ${B}`,
-              padding: "20px 48px",
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              background: "rgba(0,0,0,0.25)",
-            }}
-          >
-            <p style={{ color: "#777", fontSize: 12, letterSpacing: "0.04em" }}>
+          <div className="mt-12 flex flex-col items-center justify-between gap-2 border-t border-white/10 bg-black/25 px-6 py-5 text-center md:flex-row md:px-12 md:text-left">
+            <p className="text-xs tracking-wide text-neutral-400">
               © {YEAR} Tech Photography. All Rights Reserved.
             </p>
-            <p
-              style={{
-                color: "#6b6b6b",
-                fontSize: 12,
-                letterSpacing: "0.04em",
-              }}
-            >
+            <p className="text-xs tracking-wide text-neutral-400">
               Crafted with passion for moments that matter.
             </p>
           </div>
         </div>
       </footer>
     </div>
-  </>
+  </MotionConfig>
 );
 
 export default Footer;
