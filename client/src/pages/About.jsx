@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import "../index.css";
 
 /* ─── Edit these details in one place ───────────────────────────────────── */
-const PHOTOGRAPHER_NAME = "Alex Rivera"; // TODO: put the real name here
+const PHOTOGRAPHER_NAME = "mintesnot gezahegn"; // TODO: put the real name here
 const PHONE_DISPLAY = "+251 96 710 6705";
 const PHONE_LINK = "tel:+251967106705";
 
@@ -64,7 +64,7 @@ const SOCIALS = [
 
 function SocialLinks() {
   return (
-    <div className="flex gap-3 items-center">
+    <div className="flex items-center gap-3">
       {SOCIALS.map(({ label, href, icon }) => (
         <a
           key={label}
@@ -73,12 +73,31 @@ function SocialLinks() {
           rel="noopener noreferrer"
           aria-label={label}
           title={label}
-          className="social-btn"
+          className="a-social"
         >
           {icon}
         </a>
       ))}
     </div>
+  );
+}
+
+/* Small shared presentational pieces (no state) */
+function Eyebrow({ children, className = "" }) {
+  return (
+    <p className={`a-eyebrow ${className}`}>
+      <span aria-hidden="true" className="a-eyebrow-line" />
+      {children}
+    </p>
+  );
+}
+
+function AwardIcon() {
+  return (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <circle cx="12" cy="9" r="6" />
+      <path d="M8.5 14.5L7 22l5-3 5 3-1.5-7.5" />
+    </svg>
   );
 }
 
@@ -131,20 +150,17 @@ function StatCard({ number, label, delay = 0 }) {
   return (
     <div
       ref={ref}
-      className="text-center group"
+      className="text-center"
       style={{
         opacity: inView ? 1 : 0,
         transform: inView ? "translateY(0)" : "translateY(32px)",
         transition: `opacity 0.8s ease ${delay}ms, transform 0.8s ease ${delay}ms`,
       }}
     >
-      <div
-        className="text-5xl md:text-6xl font-bold mb-2 tracking-tight serif"
-        style={{ color: "#D4AF37" }}
-      >
+      <div className="a-serif mb-3 text-5xl font-bold leading-none tracking-tight text-[#C9A84C] tabular-nums md:text-7xl">
         {inView ? count : "0"}
       </div>
-      <div className="text-xs uppercase tracking-[0.25em] text-neutral-500 font-medium">
+      <div className="text-xs font-medium uppercase tracking-[0.22em] text-neutral-400">
         {label}
       </div>
     </div>
@@ -175,7 +191,7 @@ function TimelineItem({ year, title, description, align = "left", delay = 0 }) {
   return (
     <div
       ref={ref}
-      className={`flex gap-6 md:gap-12 ${align === "right" ? "md:flex-row-reverse" : ""}`}
+      className={`flex gap-5 md:gap-12 ${align === "right" ? "md:flex-row-reverse" : ""}`}
       style={{
         opacity: inView ? 1 : 0,
         transform: inView
@@ -185,27 +201,21 @@ function TimelineItem({ year, title, description, align = "left", delay = 0 }) {
       }}
     >
       <div
-        className={`flex-shrink-0 w-20 md:w-28 ${align === "right" ? "md:text-left" : "md:text-right"}`}
+        className={`w-16 flex-shrink-0 md:w-28 ${align === "right" ? "md:text-left" : "md:text-right"}`}
       >
-        <span className="text-2xl font-bold serif" style={{ color: "#D4AF37" }}>
+        <span className="a-serif text-3xl font-bold leading-none text-[#C9A84C]">
           {year}
         </span>
       </div>
 
       <div className="flex flex-col items-center">
-        <div
-          className="w-3 h-3 rounded-full mt-1 flex-shrink-0 ring-2 ring-offset-2 ring-offset-black"
-          style={{ backgroundColor: "#D4AF37" }}
-        />
-        <div
-          className="w-px flex-1 mt-2"
-          style={{ backgroundColor: "#1C1C1C" }}
-        />
+        <div className="mt-1.5 h-3 w-3 flex-shrink-0 rounded-full bg-[#C9A84C] shadow-[0_0_0_4px_rgba(201,168,76,0.18)]" />
+        <div className="mt-2 w-px flex-1 bg-gradient-to-b from-[#C9A84C]/40 to-white/5" />
       </div>
 
       <div className="flex-1 pb-12">
-        <h4 className="text-white text-lg font-semibold mb-2">{title}</h4>
-        <p className="text-neutral-500 text-sm leading-relaxed">
+        <h3 className="a-serif mb-2 text-2xl font-semibold text-white">{title}</h3>
+        <p className="text-sm leading-relaxed text-neutral-300 md:text-base">
           {description}
         </p>
       </div>
@@ -266,16 +276,12 @@ const About = () => {
   ];
 
   const achievements = [
-    { icon: "◈", title: "Vogue Weddings", sub: "Featured Photographer" },
-    { icon: "◉", title: "IPA Gold Award", sub: "Documentary Portraiture" },
-    {
-      icon: "◈",
-      title: "Harper's Bazaar",
-      sub: "Top 10 Wedding Photographers",
-    },
-    { icon: "◉", title: "WPPI Finalist", sub: "Best Storytelling Series" },
-    { icon: "◈", title: "Martha Stewart", sub: "Preferred Vendor" },
-    { icon: "◉", title: "The Knot Pro", sub: "Best of Weddings 2024" },
+    { title: "Vogue Weddings", sub: "Featured Photographer" },
+    { title: "IPA Gold Award", sub: "Documentary Portraiture" },
+    { title: "Harper's Bazaar", sub: "Top 10 Wedding Photographers" },
+    { title: "WPPI Finalist", sub: "Best Storytelling Series" },
+    { title: "Martha Stewart", sub: "Preferred Vendor" },
+    { title: "The Knot Pro", sub: "Best of Weddings 2024" },
   ];
 
   const [firstName, ...rest] = PHOTOGRAPHER_NAME.toUpperCase().split(" ");
@@ -283,10 +289,12 @@ const About = () => {
 
   return (
     <div
+      className="a-root"
       style={{
         backgroundColor: "#000",
         color: "#fff",
-        fontFamily: "'Inter', sans-serif",
+        fontFamily: "'Inter', system-ui, sans-serif",
+        overflowX: "hidden",
       }}
     >
       {/* ── HERO ──────────────────────────────────────────────────────── */}
@@ -294,9 +302,12 @@ const About = () => {
         className="relative overflow-hidden"
         style={{ height: "100svh", minHeight: "640px" }}
       >
+        {/* Oversized layer so the parallax shift never exposes an empty edge */}
         <div
-          className="absolute inset-0"
+          className="a-parallax absolute left-0 right-0"
           style={{
+            top: "-35%",
+            height: "135%",
             transform: `translateY(${scrollY * 0.3}px)`,
             willChange: "transform",
           }}
@@ -304,8 +315,8 @@ const About = () => {
           <img
             src="https://images.unsplash.com/photo-1606216794074-735e91aa2c92?auto=format&fit=crop&w=2000&q=80"
             alt={`${PHOTOGRAPHER_NAME} — Photographer`}
-            className="w-full h-full object-cover"
-            style={{ transform: "scale(1.15)", transformOrigin: "center top" }}
+            className="h-full w-full object-cover"
+            style={{ objectPosition: "center 35%" }}
             onLoad={() => setHeroLoaded(true)}
           />
         </div>
@@ -314,20 +325,20 @@ const About = () => {
           className="absolute inset-0"
           style={{
             background:
-              "linear-gradient(to bottom, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.1) 30%, rgba(0,0,0,0.5) 70%, rgba(0,0,0,0.95) 100%)",
+              "linear-gradient(to bottom, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0.2) 30%, rgba(0,0,0,0.6) 70%, #000 100%)",
           }}
         />
         <div
           className="absolute inset-0"
           style={{
             background:
-              "linear-gradient(to right, rgba(0,0,0,0.7) 0%, transparent 60%)",
+              "linear-gradient(to right, rgba(0,0,0,0.78) 0%, transparent 65%)",
           }}
         />
 
         {/* Top bar: name + social links */}
         <div
-          className="absolute top-0 left-0 right-0 flex items-center justify-between px-8 md:px-14 py-8"
+          className="absolute left-0 right-0 top-0 flex flex-wrap items-center justify-between gap-4 px-6 py-6 md:px-14 md:py-8"
           style={{
             opacity: heroLoaded ? 1 : 0,
             transform: heroLoaded ? "translateY(0)" : "translateY(-20px)",
@@ -335,13 +346,10 @@ const About = () => {
           }}
         >
           <div className="flex items-center gap-3">
-            <span className="gold text-lg" aria-hidden="true">
+            <span className="text-lg text-[#C9A84C]" aria-hidden="true">
               ✦
             </span>
-            <span
-              className="text-xs uppercase text-neutral-400"
-              style={{ letterSpacing: "0.28em" }}
-            >
+            <span className="text-xs font-medium uppercase tracking-[0.28em] text-neutral-200">
               {PHOTOGRAPHER_NAME}
             </span>
           </div>
@@ -350,18 +358,16 @@ const About = () => {
 
         {/* Hero copy */}
         <div
-          className="absolute bottom-0 left-0 px-8 md:px-14 pb-20 md:pb-24"
+          className="absolute bottom-0 left-0 right-0 px-6 pb-20 md:px-14 md:pb-24"
           style={{
             opacity: heroLoaded ? 1 : 0,
             transform: heroLoaded ? "translateY(0)" : "translateY(30px)",
             transition: "opacity 1s ease 0.6s, transform 1s ease 0.6s",
           }}
         >
-          <p className="text-xs uppercase tracking-[0.3em] text-neutral-400 mb-4">
-            Fine Art Wedding Photography
-          </p>
+          <Eyebrow className="mb-5">Fine Art Wedding Photography</Eyebrow>
           <h1
-            className="serif font-bold leading-none mb-4"
+            className="a-serif mb-5 font-bold leading-[0.95]"
             style={{
               fontSize: "clamp(3.5rem, 10vw, 9rem)",
               letterSpacing: "-0.02em",
@@ -370,30 +376,30 @@ const About = () => {
           >
             {firstName}
             <br />
-            <span style={{ color: "#D4AF37", fontStyle: "italic" }}>
+            <span style={{ color: "#C9A84C", fontStyle: "italic", fontWeight: 400 }}>
               {lastName}
             </span>
           </h1>
-          <p className="text-neutral-300 text-lg md:text-xl font-light mb-10 max-w-md">
+          <p className="mb-10 max-w-md text-lg font-light text-neutral-200 md:text-xl">
             Storyteller through light
           </p>
           <div className="flex flex-wrap gap-4">
-            <Link to="/contact" className="cta-btn">
+            <Link to="/contact" className="a-cta">
               Book a Session →
             </Link>
-            <Link to="/gallery" className="outline-btn">
+            <Link to="/gallery" className="a-outline">
               View Portfolio →
             </Link>
           </div>
         </div>
 
         <div
-          className="absolute bottom-8 right-10 flex flex-col items-center gap-2"
-          style={{ opacity: 0.4 }}
+          className="absolute bottom-8 right-8 hidden flex-col items-center gap-2 md:flex"
+          style={{ opacity: 0.6 }}
           aria-hidden="true"
         >
           <span
-            className="text-xs uppercase tracking-[0.25em] text-neutral-500"
+            className="text-[10px] uppercase tracking-[0.25em] text-neutral-300"
             style={{ writingMode: "vertical-rl" }}
           >
             Scroll
@@ -402,7 +408,7 @@ const About = () => {
             className="w-px"
             style={{
               height: "56px",
-              background: "linear-gradient(to bottom, transparent, #D4AF37)",
+              background: "linear-gradient(to bottom, transparent, #C9A84C)",
             }}
           />
         </div>
@@ -410,12 +416,12 @@ const About = () => {
 
       {/* ── TICKER ────────────────────────────────────────────────────── */}
       <div
-        className="overflow-hidden py-4 border-y"
-        style={{ borderColor: "#1A1A1A", backgroundColor: "#050505" }}
+        className="a-ticker overflow-hidden border-y py-4"
+        style={{ borderColor: "rgba(255,255,255,0.08)", backgroundColor: "#050505" }}
       >
-        <div className="ticker-track">
+        <div className="ticker-track a-ticker-track">
           {[...Array(2)].map((_, i) => (
-            <div key={i} className="flex items-center">
+            <div key={i} className="flex flex-shrink-0 items-center" aria-hidden={i === 1 ? "true" : undefined}>
               {[
                 "Fine Art Photography",
                 "◆",
@@ -436,8 +442,8 @@ const About = () => {
               ].map((item, j) => (
                 <span
                   key={j}
-                  className="px-6 text-xs uppercase tracking-[0.2em]"
-                  style={{ color: item === "◆" ? "#D4AF37" : "#555" }}
+                  className="whitespace-nowrap px-6 text-xs uppercase tracking-[0.2em]"
+                  style={{ color: item === "◆" ? "#C9A84C" : "#A3A3A3" }}
                 >
                   {item}
                 </span>
@@ -448,37 +454,29 @@ const About = () => {
       </div>
 
       {/* ── ABOUT / EDITORIAL SPLIT ───────────────────────────────────── */}
-      <section className="px-8 md:px-14 py-24 md:py-36" id="about">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid md:grid-cols-12 gap-16 items-start">
+      <section className="px-6 py-24 md:px-14 md:py-36" id="about">
+        <div className="mx-auto max-w-7xl">
+          <div className="grid items-start gap-14 md:grid-cols-12 md:gap-16">
             <div className="md:col-span-7">
               <Reveal>
-                <p className="text-xs uppercase tracking-[0.3em] gold mb-6">
-                  The Photographer
-                </p>
+                <Eyebrow className="mb-6">The Photographer</Eyebrow>
                 <h2
-                  className="serif font-bold leading-tight mb-10"
+                  className="a-serif mb-10 font-bold leading-[1.05]"
                   style={{
-                    fontSize: "clamp(2.2rem, 5vw, 4.5rem)",
+                    fontSize: "clamp(2.4rem, 5vw, 4.5rem)",
                     letterSpacing: "-0.02em",
                   }}
                 >
                   Capturing moments
                   <br />
-                  <span
-                    className="gold-line"
-                    style={{ fontStyle: "italic", fontWeight: 400 }}
-                  >
+                  <span style={{ fontStyle: "italic", fontWeight: 400, color: "#C9A84C" }}>
                     that matter most.
                   </span>
                 </h2>
               </Reveal>
 
               <Reveal delay={150}>
-                <div
-                  className="space-y-6 text-neutral-400 leading-[1.9] max-w-xl"
-                  style={{ fontSize: "17px" }}
-                >
+                <div className="max-w-xl space-y-6 text-[17px] leading-[1.9] text-neutral-300">
                   <p>
                     With over 12 years behind the lens, I specialize in turning
                     fleeting moments into timeless stories. My approach combines
@@ -494,7 +492,7 @@ const About = () => {
 
               <Reveal delay={250}>
                 <div className="mt-12 flex flex-wrap items-center gap-6">
-                  <Link to="/contact" className="cta-btn">
+                  <Link to="/contact" className="a-cta">
                     Work With Me →
                   </Link>
                   <SocialLinks />
@@ -502,44 +500,35 @@ const About = () => {
               </Reveal>
             </div>
 
-            <div className="md:col-span-5 space-y-6">
+            <div className="space-y-6 md:col-span-5">
               <Reveal delay={200}>
-                <div
-                  className="portrait-frame rounded-sm overflow-hidden"
-                  style={{ padding: "1px" }}
-                >
+                <div className="a-portrait">
                   <img
                     src="https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?auto=format&fit=crop&w=800&q=80"
                     alt={PHOTOGRAPHER_NAME}
-                    className="w-full object-cover rounded-sm"
-                    style={{
-                      height: "420px",
-                      filter: "grayscale(20%) contrast(1.05)",
-                    }}
+                    loading="lazy"
+                    className="aspect-[4/5] w-full object-cover"
+                    style={{ filter: "grayscale(20%) contrast(1.05)" }}
                   />
                 </div>
               </Reveal>
 
               <Reveal delay={350}>
-                <div className="glass rounded-2xl p-7">
-                  <p className="text-xs uppercase tracking-[0.25em] text-neutral-600 mb-3">
+                <div className="a-glass rounded-3xl p-7">
+                  <p className="mb-3 text-xs font-medium uppercase tracking-[0.25em] text-neutral-400">
                     Based in
                   </p>
-                  <p className="serif text-2xl text-white mb-5">
+                  <p className="a-serif mb-5 text-3xl font-semibold text-white">
                     New York · Available Worldwide
                   </p>
                   <div
-                    className="pt-5 border-t"
-                    style={{ borderColor: "rgba(255,255,255,0.06)" }}
+                    className="border-t pt-5"
+                    style={{ borderColor: "rgba(255,255,255,0.08)" }}
                   >
-                    <p className="text-neutral-500 text-sm leading-relaxed mb-5">
+                    <p className="mb-5 text-sm leading-relaxed text-neutral-300">
                       Ready to create something beautiful together?
                     </p>
-                    <a
-                      href="#contact"
-                      className="outline-btn"
-                      style={{ fontSize: "12px", padding: "10px 22px" }}
-                    >
+                    <a href="#contact" className="a-outline a-outline-sm">
                       Get in Touch →
                     </a>
                   </div>
@@ -552,11 +541,11 @@ const About = () => {
 
       {/* ── STATS ─────────────────────────────────────────────────────── */}
       <section
-        className="py-20 md:py-28 px-8 md:px-14 border-y"
-        style={{ borderColor: "#111", backgroundColor: "#030303" }}
+        className="border-y px-6 py-20 md:px-14 md:py-28"
+        style={{ borderColor: "rgba(255,255,255,0.08)", backgroundColor: "#050505" }}
       >
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-10 md:gap-6">
+        <div className="mx-auto max-w-7xl">
+          <div className="grid grid-cols-2 gap-10 md:grid-cols-4 md:gap-6">
             {stats.map((s, i) => (
               <StatCard
                 key={i}
@@ -570,23 +559,21 @@ const About = () => {
       </section>
 
       {/* ── MY JOURNEY ────────────────────────────────────────────────── */}
-      <section className="px-8 md:px-14 py-24 md:py-36" id="journey">
-        <div className="max-w-7xl mx-auto">
+      <section className="px-6 py-24 md:px-14 md:py-36" id="journey">
+        <div className="mx-auto max-w-7xl">
           <Reveal>
-            <div className="mb-16 md:mb-24 max-w-2xl">
-              <p className="text-xs uppercase tracking-[0.3em] gold mb-5">
-                My Journey
-              </p>
+            <div className="mb-16 max-w-2xl md:mb-24">
+              <Eyebrow className="mb-5">My Journey</Eyebrow>
               <h2
-                className="serif font-bold leading-tight"
+                className="a-serif font-bold leading-[1.05]"
                 style={{
-                  fontSize: "clamp(2rem, 4.5vw, 4rem)",
+                  fontSize: "clamp(2.2rem, 4.5vw, 4rem)",
                   letterSpacing: "-0.02em",
                 }}
               >
                 Every story begins
                 <br />
-                <em className="font-normal" style={{ color: "#D4AF37" }}>
+                <em className="font-normal" style={{ color: "#C9A84C" }}>
                   with a single frame.
                 </em>
               </h2>
@@ -595,24 +582,16 @@ const About = () => {
 
           <Reveal delay={100}>
             <div
-              className="grid grid-cols-3 gap-3 md:gap-4 mb-24"
-              style={{ height: "360px" }}
+              className="mb-24 grid grid-cols-3 gap-3 md:gap-4"
+              style={{ height: "clamp(260px, 42vw, 440px)" }}
             >
-              <div className="col-span-2 overflow-hidden rounded-sm">
+              <div className="a-zoom col-span-2 overflow-hidden rounded-2xl">
                 <img
                   src="https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=1200&q=80"
                   alt="In the field"
-                  className="w-full h-full object-cover"
-                  style={{
-                    filter: "grayscale(15%) contrast(1.08)",
-                    transition: "transform 0.8s ease",
-                  }}
-                  onMouseEnter={(e) =>
-                    (e.currentTarget.style.transform = "scale(1.04)")
-                  }
-                  onMouseLeave={(e) =>
-                    (e.currentTarget.style.transform = "scale(1)")
-                  }
+                  loading="lazy"
+                  className="h-full w-full object-cover"
+                  style={{ filter: "grayscale(15%) contrast(1.08)" }}
                 />
               </div>
               <div className="flex flex-col gap-3 md:gap-4">
@@ -620,21 +599,13 @@ const About = () => {
                   ["photo-1519741497674-611481863552", "Studio work"],
                   ["photo-1465495976277-4387d4b0b4c6", "On location"],
                 ].map(([id, alt]) => (
-                  <div key={id} className="flex-1 overflow-hidden rounded-sm">
+                  <div key={id} className="a-zoom flex-1 overflow-hidden rounded-2xl">
                     <img
                       src={`https://images.unsplash.com/${id}?auto=format&fit=crop&w=600&q=80`}
                       alt={alt}
-                      className="w-full h-full object-cover"
-                      style={{
-                        filter: "grayscale(15%) contrast(1.05)",
-                        transition: "transform 0.8s ease",
-                      }}
-                      onMouseEnter={(e) =>
-                        (e.currentTarget.style.transform = "scale(1.05)")
-                      }
-                      onMouseLeave={(e) =>
-                        (e.currentTarget.style.transform = "scale(1)")
-                      }
+                      loading="lazy"
+                      className="h-full w-full object-cover"
+                      style={{ filter: "grayscale(15%) contrast(1.05)" }}
                     />
                   </div>
                 ))}
@@ -643,10 +614,7 @@ const About = () => {
           </Reveal>
 
           <Reveal delay={200}>
-            <div
-              className="grid md:grid-cols-2 gap-10 md:gap-16 text-neutral-400 leading-[1.9]"
-              style={{ fontSize: "16px" }}
-            >
+            <div className="grid gap-10 text-base leading-[1.9] text-neutral-300 md:grid-cols-2 md:gap-16">
               <p>
                 I didn't plan to become a wedding photographer. I planned to be
                 a graphic designer. But one afternoon in 2012, a colleague asked
@@ -666,19 +634,17 @@ const About = () => {
 
       {/* ── TIMELINE ──────────────────────────────────────────────────── */}
       <section
-        className="py-24 md:py-36 px-8 md:px-14 border-t"
-        style={{ borderColor: "#111", backgroundColor: "#030303" }}
+        className="border-t px-6 py-24 md:px-14 md:py-36"
+        style={{ borderColor: "rgba(255,255,255,0.08)", backgroundColor: "#050505" }}
       >
-        <div className="max-w-4xl mx-auto">
+        <div className="mx-auto max-w-4xl">
           <Reveal>
             <div className="mb-16">
-              <p className="text-xs uppercase tracking-[0.3em] gold mb-5">
-                Timeline
-              </p>
+              <Eyebrow className="mb-5">Timeline</Eyebrow>
               <h2
-                className="serif font-bold"
+                className="a-serif font-bold"
                 style={{
-                  fontSize: "clamp(2rem, 4vw, 3.5rem)",
+                  fontSize: "clamp(2.2rem, 4vw, 3.5rem)",
                   letterSpacing: "-0.02em",
                 }}
               >
@@ -703,42 +669,43 @@ const About = () => {
       </section>
 
       {/* ── ACHIEVEMENTS ──────────────────────────────────────────────── */}
-      <section className="py-24 md:py-36 px-8 md:px-14">
-        <div className="max-w-7xl mx-auto">
+      <section className="px-6 py-24 md:px-14 md:py-36">
+        <div className="mx-auto max-w-7xl">
           <Reveal>
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-14">
+            <div className="mb-14 flex flex-col justify-between gap-6 md:flex-row md:items-end">
               <div>
-                <p className="text-xs uppercase tracking-[0.3em] gold mb-4">
-                  Recognition
-                </p>
+                <Eyebrow className="mb-4">Recognition</Eyebrow>
                 <h2
-                  className="serif font-bold"
+                  className="a-serif font-bold"
                   style={{
-                    fontSize: "clamp(2rem, 4vw, 3.5rem)",
+                    fontSize: "clamp(2.2rem, 4vw, 3.5rem)",
                     letterSpacing: "-0.02em",
                   }}
                 >
                   Industry honours.
                 </h2>
               </div>
-              <p className="text-neutral-600 text-sm max-w-xs leading-relaxed">
+              <p className="max-w-xs text-sm leading-relaxed text-neutral-300">
                 A selection of recognitions earned over twelve years of quiet,
                 relentless work.
               </p>
             </div>
           </Reveal>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
             {achievements.map((a, i) => (
-              <Reveal key={i} delay={i * 80}>
-                <div className="achievement-card rounded-2xl p-7">
-                  <div className="gold text-2xl mb-5" aria-hidden="true">
-                    {a.icon}
+              <Reveal key={i} delay={i * 80} className="h-full">
+                <div className="a-achievement h-full rounded-3xl p-7">
+                  <div
+                    className="mb-5 flex h-11 w-11 items-center justify-center rounded-full border border-[#C9A84C]/30 bg-[#C9A84C]/10 text-[#C9A84C]"
+                    aria-hidden="true"
+                  >
+                    <AwardIcon />
                   </div>
-                  <div className="text-white font-semibold text-base mb-1">
+                  <div className="a-serif mb-1 text-2xl font-semibold text-white">
                     {a.title}
                   </div>
-                  <div className="text-neutral-600 text-sm">{a.sub}</div>
+                  <div className="text-sm text-neutral-300">{a.sub}</div>
                 </div>
               </Reveal>
             ))}
@@ -748,40 +715,40 @@ const About = () => {
 
       {/* ── CTA STRIP (the site footer below this comes from App.jsx) ─── */}
       <section
-        className="relative overflow-hidden py-24 md:py-32 px-8 md:px-14 border-t"
-        style={{ borderColor: "#111", backgroundColor: "#050505" }}
+        className="relative overflow-hidden border-t px-6 py-24 md:px-14 md:py-32"
+        style={{ borderColor: "rgba(255,255,255,0.08)", backgroundColor: "#050505" }}
         id="contact"
       >
         <div
-          className="absolute inset-0 pointer-events-none"
+          className="pointer-events-none absolute inset-0"
           style={{
             background:
-              "radial-gradient(ellipse 60% 50% at 50% 50%, rgba(212,175,55,0.04) 0%, transparent 70%)",
+              "radial-gradient(ellipse 60% 50% at 50% 50%, rgba(201,168,76,0.09) 0%, transparent 70%)",
           }}
         />
-        <div className="max-w-4xl mx-auto text-center relative">
+        <div className="relative mx-auto max-w-4xl text-center">
           <Reveal>
-            <span className="gold text-3xl" aria-hidden="true">
+            <span className="text-3xl text-[#C9A84C]" aria-hidden="true">
               ✦
             </span>
             <h2
-              className="serif font-bold my-6 leading-tight"
+              className="a-serif my-6 font-bold leading-[1.05]"
               style={{
-                fontSize: "clamp(2rem, 5vw, 4.5rem)",
+                fontSize: "clamp(2.2rem, 5vw, 4.5rem)",
                 letterSpacing: "-0.02em",
               }}
             >
               Let's create something
               <br />
-              <em className="font-normal" style={{ color: "#D4AF37" }}>
+              <em className="font-normal" style={{ color: "#C9A84C" }}>
                 unforgettable.
               </em>
             </h2>
-            <p className="text-neutral-500 text-lg mb-10 max-w-xl mx-auto leading-relaxed">
+            <p className="mx-auto mb-10 max-w-xl text-lg leading-relaxed text-neutral-300">
               Available worldwide · Now booking 2026–2027
             </p>
-            <div className="flex flex-wrap justify-center items-center gap-6">
-              <a href={PHONE_LINK} className="cta-btn">
+            <div className="flex flex-wrap items-center justify-center gap-6">
+              <a href={PHONE_LINK} className="a-cta">
                 Call {PHONE_DISPLAY} →
               </a>
               <SocialLinks />
@@ -789,6 +756,85 @@ const About = () => {
           </Reveal>
         </div>
       </section>
+
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=Inter:wght@300;400;500;600;700&display=swap');
+
+        .a-serif { font-family: 'Cormorant Garamond', Georgia, serif; }
+        .a-root ::selection { background: rgba(201,168,76,0.35); color: #fff; }
+        .a-root a:focus-visible, .a-root button:focus-visible {
+          outline: 2px solid #C9A84C; outline-offset: 4px;
+        }
+
+        .a-eyebrow {
+          display: flex; align-items: center; gap: 14px;
+          font-size: 12px; font-weight: 500; letter-spacing: 0.3em;
+          text-transform: uppercase; color: #C9A84C;
+        }
+        .a-eyebrow-line { width: 28px; height: 1px; background: rgba(201,168,76,0.7); flex-shrink: 0; }
+
+        .a-cta, .a-outline {
+          display: inline-flex; align-items: center; justify-content: center;
+          min-height: 48px; padding: 12px 30px; border-radius: 999px;
+          font-size: 12px; font-weight: 700; letter-spacing: 0.16em;
+          text-transform: uppercase; text-decoration: none; cursor: pointer;
+          transition: background 0.3s ease, color 0.3s ease, border-color 0.3s ease,
+                      box-shadow 0.3s ease, transform 0.3s ease;
+        }
+        .a-cta { background: #C9A84C; color: #000; box-shadow: 0 0 36px rgba(201,168,76,0.28); }
+        .a-cta:hover { background: #DFC060; box-shadow: 0 0 56px rgba(201,168,76,0.45); transform: translateY(-2px); }
+        .a-outline { color: #fff; border: 1px solid rgba(255,255,255,0.35); background: rgba(0,0,0,0.25); backdrop-filter: blur(8px); }
+        .a-outline:hover { border-color: #C9A84C; color: #C9A84C; background: rgba(201,168,76,0.08); transform: translateY(-2px); }
+        .a-outline-sm { min-height: 44px; padding: 10px 24px; }
+
+        .a-social {
+          display: flex; align-items: center; justify-content: center;
+          width: 44px; height: 44px; border-radius: 50%; flex-shrink: 0;
+          color: rgba(255,255,255,0.85); text-decoration: none;
+          border: 1px solid rgba(255,255,255,0.18); background: rgba(0,0,0,0.35);
+          backdrop-filter: blur(10px);
+          transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        .a-social:hover {
+          color: #C9A84C; border-color: #C9A84C; background: rgba(201,168,76,0.1);
+          transform: translateY(-2px) scale(1.08); box-shadow: 0 0 22px rgba(201,168,76,0.22);
+        }
+
+        .a-glass {
+          border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.04);
+          backdrop-filter: blur(16px); box-shadow: 0 24px 60px -12px rgba(0,0,0,0.6);
+        }
+        .a-portrait {
+          padding: 1px; border-radius: 1.5rem; overflow: hidden;
+          background: linear-gradient(135deg, rgba(201,168,76,0.7), rgba(255,255,255,0.08) 45%, rgba(201,168,76,0.35));
+          box-shadow: 0 32px 80px -16px rgba(0,0,0,0.7);
+        }
+        .a-portrait img { border-radius: calc(1.5rem - 1px); display: block; }
+
+        .a-achievement {
+          border: 1px solid rgba(255,255,255,0.09); background: rgba(255,255,255,0.03);
+          transition: border-color 0.4s ease, background 0.4s ease, transform 0.4s ease;
+        }
+        .a-achievement:hover { border-color: rgba(201,168,76,0.4); background: rgba(201,168,76,0.05); transform: translateY(-4px); }
+
+        .a-zoom img { transition: transform 0.8s cubic-bezier(0.22, 1, 0.36, 1); }
+        .a-zoom:hover img { transform: scale(1.05); }
+
+        /* Ticker: pauses on hover; two copies, so -50% loops seamlessly */
+        .a-ticker-track { display: flex; width: max-content; animation: aTicker 40s linear infinite; }
+        .a-ticker:hover .a-ticker-track { animation-play-state: paused; }
+        @keyframes aTicker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+        @media (prefers-reduced-motion: reduce) {
+          .a-root *, .a-root *::before, .a-root *::after {
+            animation-duration: 0.01ms !important; animation-iteration-count: 1 !important;
+            transition-duration: 0.01ms !important;
+          }
+          .a-parallax { transform: none !important; }
+          .a-ticker { overflow-x: auto !important; }
+          .a-ticker-track { animation: none !important; }
+        }
+      `}</style>
     </div>
   );
 };
