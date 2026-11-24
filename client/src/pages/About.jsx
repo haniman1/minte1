@@ -1,24 +1,107 @@
 import { useState, useEffect, useRef } from "react";
+import { Link } from "react-router-dom";
 import "../index.css";
+
+/* ─── Edit these details in one place ───────────────────────────────────── */
+const PHOTOGRAPHER_NAME = "Alex Rivera"; // TODO: put the real name here
+const PHONE_DISPLAY = "+251 96 710 6705";
+const PHONE_LINK = "tel:+251967106705";
+
+const iconProps = {
+  width: 18,
+  height: 18,
+  viewBox: "0 0 24 24",
+  "aria-hidden": "true",
+};
+const strokeProps = {
+  fill: "none",
+  stroke: "currentColor",
+  strokeWidth: 2.2,
+  strokeLinecap: "round",
+  strokeLinejoin: "round",
+};
+
+const SOCIALS = [
+  {
+    label: "TikTok",
+    href: "https://www.tiktok.com/@mintesinot_g",
+    icon: (
+      <svg {...iconProps} fill="currentColor">
+        <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.77h-3.13v13.17a2.9 2.9 0 1 1-2.9-2.9c.24 0 .47.03.69.08V9.09a6.03 6.03 0 0 0-.69-.04A6.03 6.03 0 1 0 15.82 15V8.34a8.02 8.02 0 0 0 4.69 1.5V6.69h-.92z" />
+      </svg>
+    ),
+  },
+  {
+    label: "Instagram",
+    href: "https://www.instagram.com/minte_gett/",
+    icon: (
+      <svg {...iconProps} {...strokeProps}>
+        <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+        <circle cx="12" cy="12" r="4" />
+        <circle cx="17.5" cy="6.5" r="0.5" fill="currentColor" />
+      </svg>
+    ),
+  },
+  {
+    label: "Facebook group",
+    href: "https://www.facebook.com/groups/1183400838772325/",
+    icon: (
+      <svg {...iconProps} {...strokeProps}>
+        <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
+      </svg>
+    ),
+  },
+  {
+    label: "Telegram",
+    href: "https://t.me/TechStudio_WithMinte",
+    icon: (
+      <svg {...iconProps} fill="currentColor">
+        <path d="M21.5 2.5L2.9 9.7c-1.3.5-1.3 1.2-.2 1.5l4.8 1.5 11.1-7c.5-.3 1-.1.6.3l-9 8.1-.3 4.8c.4 0 .6-.2.9-.4l2.3-2.2 4.7 3.5c.9.5 1.5.2 1.7-.8l3.2-15.1c.3-1.2-.4-1.8-1.2-1.2z" />
+      </svg>
+    ),
+  },
+];
+
+function SocialLinks() {
+  return (
+    <div className="flex gap-3 items-center">
+      {SOCIALS.map(({ label, href, icon }) => (
+        <a
+          key={label}
+          href={href}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={label}
+          title={label}
+          className="social-btn"
+        >
+          {icon}
+        </a>
+      ))}
+    </div>
+  );
+}
 
 /* ─── Animated Counter Hook ─────────────────────────────────────────────── */
 function useCountUp(target, duration = 2000, start = false) {
-  const [count, setCount] = useState(0);
+  const [count, setCount] = useState("0");
   useEffect(() => {
     if (!start) return;
     const numeric = parseInt(target.replace(/\D/g, ""), 10);
     const suffix = target.replace(/[0-9]/g, "");
     let startTime = null;
+    let frame;
     const step = (timestamp) => {
       if (!startTime) startTime = timestamp;
       const progress = Math.min((timestamp - startTime) / duration, 1);
       const eased = 1 - Math.pow(1 - progress, 3);
       setCount(Math.floor(eased * numeric) + suffix);
-      if (progress < 1) requestAnimationFrame(step);
+      if (progress < 1) frame = requestAnimationFrame(step);
     };
-    requestAnimationFrame(step);
+    frame = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(frame);
   }, [start, target, duration]);
-  return count || "0";
+  return count;
 }
 
 /* ─── Intersection Observer Hook ────────────────────────────────────────── */
@@ -101,7 +184,6 @@ function TimelineItem({ year, title, description, align = "left", delay = 0 }) {
         transition: `opacity 0.9s ease ${delay}ms, transform 0.9s ease ${delay}ms`,
       }}
     >
-      {/* Year */}
       <div
         className={`flex-shrink-0 w-20 md:w-28 ${align === "right" ? "md:text-left" : "md:text-right"}`}
       >
@@ -110,7 +192,6 @@ function TimelineItem({ year, title, description, align = "left", delay = 0 }) {
         </span>
       </div>
 
-      {/* Dot + line */}
       <div className="flex flex-col items-center">
         <div
           className="w-3 h-3 rounded-full mt-1 flex-shrink-0 ring-2 ring-offset-2 ring-offset-black"
@@ -122,7 +203,6 @@ function TimelineItem({ year, title, description, align = "left", delay = 0 }) {
         />
       </div>
 
-      {/* Content */}
       <div className="flex-1 pb-12">
         <h4 className="text-white text-lg font-semibold mb-2">{title}</h4>
         <p className="text-neutral-500 text-sm leading-relaxed">
@@ -137,7 +217,6 @@ function TimelineItem({ year, title, description, align = "left", delay = 0 }) {
 const About = () => {
   const [scrollY, setScrollY] = useState(0);
   const [heroLoaded, setHeroLoaded] = useState(false);
-  const heroRef = useRef(null);
 
   useEffect(() => {
     const handleScroll = () => setScrollY(window.scrollY);
@@ -145,6 +224,7 @@ const About = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // NOTE: the text below is sample content. Replace it with the photographer's real details.
   const stats = [
     { number: "12+", label: "Years Experience" },
     { number: "850+", label: "Weddings Captured" },
@@ -198,6 +278,9 @@ const About = () => {
     { icon: "◉", title: "The Knot Pro", sub: "Best of Weddings 2024" },
   ];
 
+  const [firstName, ...rest] = PHOTOGRAPHER_NAME.toUpperCase().split(" ");
+  const lastName = rest.join(" ");
+
   return (
     <div
       style={{
@@ -208,11 +291,9 @@ const About = () => {
     >
       {/* ── HERO ──────────────────────────────────────────────────────── */}
       <section
-        ref={heroRef}
         className="relative overflow-hidden"
         style={{ height: "100svh", minHeight: "640px" }}
       >
-        {/* Parallax image */}
         <div
           className="absolute inset-0"
           style={{
@@ -222,14 +303,13 @@ const About = () => {
         >
           <img
             src="https://images.unsplash.com/photo-1606216794074-735e91aa2c92?auto=format&fit=crop&w=2000&q=80"
-            alt="Alex Rivera — Wedding Photographer"
+            alt={`${PHOTOGRAPHER_NAME} — Photographer`}
             className="w-full h-full object-cover"
             style={{ transform: "scale(1.15)", transformOrigin: "center top" }}
             onLoad={() => setHeroLoaded(true)}
           />
         </div>
 
-        {/* Multi-layer gradient */}
         <div
           className="absolute inset-0"
           style={{
@@ -245,7 +325,7 @@ const About = () => {
           }}
         />
 
-        {/* Top bar */}
+        {/* Top bar: name + social links */}
         <div
           className="absolute top-0 left-0 right-0 flex items-center justify-between px-8 md:px-14 py-8"
           style={{
@@ -255,42 +335,17 @@ const About = () => {
           }}
         >
           <div className="flex items-center gap-3">
-            <span className="gold text-lg">✦</span>
+            <span className="gold text-lg" aria-hidden="true">
+              ✦
+            </span>
             <span
               className="text-xs uppercase text-neutral-400"
               style={{ letterSpacing: "0.28em" }}
             >
-              Alex Rivera
+              {PHOTOGRAPHER_NAME}
             </span>
           </div>
-          <div className="flex gap-3">
-            <a
-              href="https://twitter.com/yourusername"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="social-btn"
-            >
-              𝕏
-            </a>
-
-            <a
-              href="https://instagram.com/yourusername"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="social-btn"
-            >
-              ◎
-            </a>
-
-            <a
-              href="https://facebook.com/yourusername"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="social-btn"
-            >
-              f
-            </a>
-          </div>
+          <SocialLinks />
         </div>
 
         {/* Hero copy */}
@@ -313,29 +368,29 @@ const About = () => {
               textShadow: "0 0 80px rgba(0,0,0,0.8)",
             }}
           >
-            ALEX
+            {firstName}
             <br />
             <span style={{ color: "#D4AF37", fontStyle: "italic" }}>
-              RIVERA
+              {lastName}
             </span>
           </h1>
           <p className="text-neutral-300 text-lg md:text-xl font-light mb-10 max-w-md">
             Storyteller through light
           </p>
           <div className="flex flex-wrap gap-4">
-            <a href="/contact" className="cta-btn">
+            <Link to="/contact" className="cta-btn">
               Book a Session →
-            </a>
-            <a href="/gallery" className="outline-btn">
+            </Link>
+            <Link to="/gallery" className="outline-btn">
               View Portfolio →
-            </a>
+            </Link>
           </div>
         </div>
 
-        {/* Scroll indicator */}
         <div
           className="absolute bottom-8 right-10 flex flex-col items-center gap-2"
           style={{ opacity: 0.4 }}
+          aria-hidden="true"
         >
           <span
             className="text-xs uppercase tracking-[0.25em] text-neutral-500"
@@ -344,7 +399,7 @@ const About = () => {
             Scroll
           </span>
           <div
-            className="w-px bg-neutral-600"
+            className="w-px"
             style={{
               height: "56px",
               background: "linear-gradient(to bottom, transparent, #D4AF37)",
@@ -396,7 +451,6 @@ const About = () => {
       <section className="px-8 md:px-14 py-24 md:py-36" id="about">
         <div className="max-w-7xl mx-auto">
           <div className="grid md:grid-cols-12 gap-16 items-start">
-            {/* Left column */}
             <div className="md:col-span-7">
               <Reveal>
                 <p className="text-xs uppercase tracking-[0.3em] gold mb-6">
@@ -439,15 +493,15 @@ const About = () => {
               </Reveal>
 
               <Reveal delay={250}>
-                <div className="mt-12 flex flex-wrap gap-4">
-                  <a href="/contact" className="cta-btn">
+                <div className="mt-12 flex flex-wrap items-center gap-6">
+                  <Link to="/contact" className="cta-btn">
                     Work With Me →
-                  </a>
+                  </Link>
+                  <SocialLinks />
                 </div>
               </Reveal>
             </div>
 
-            {/* Right: portrait + glass card */}
             <div className="md:col-span-5 space-y-6">
               <Reveal delay={200}>
                 <div
@@ -456,7 +510,7 @@ const About = () => {
                 >
                   <img
                     src="https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?auto=format&fit=crop&w=800&q=80"
-                    alt="Alex Rivera"
+                    alt={PHOTOGRAPHER_NAME}
                     className="w-full object-cover rounded-sm"
                     style={{
                       height: "420px",
@@ -539,7 +593,6 @@ const About = () => {
             </div>
           </Reveal>
 
-          {/* Editorial 3-image grid */}
           <Reveal delay={100}>
             <div
               className="grid grid-cols-3 gap-3 md:gap-4 mb-24"
@@ -555,51 +608,40 @@ const About = () => {
                     transition: "transform 0.8s ease",
                   }}
                   onMouseEnter={(e) =>
-                    (e.target.style.transform = "scale(1.04)")
+                    (e.currentTarget.style.transform = "scale(1.04)")
                   }
-                  onMouseLeave={(e) => (e.target.style.transform = "scale(1)")}
+                  onMouseLeave={(e) =>
+                    (e.currentTarget.style.transform = "scale(1)")
+                  }
                 />
               </div>
               <div className="flex flex-col gap-3 md:gap-4">
-                <div className="flex-1 overflow-hidden rounded-sm">
-                  <img
-                    src="https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=600&q=80"
-                    alt="Studio work"
-                    className="w-full h-full object-cover"
-                    style={{
-                      filter: "grayscale(15%) contrast(1.05)",
-                      transition: "transform 0.8s ease",
-                    }}
-                    onMouseEnter={(e) =>
-                      (e.target.style.transform = "scale(1.05)")
-                    }
-                    onMouseLeave={(e) =>
-                      (e.target.style.transform = "scale(1)")
-                    }
-                  />
-                </div>
-                <div className="flex-1 overflow-hidden rounded-sm">
-                  <img
-                    src="https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?auto=format&fit=crop&w=600&q=80"
-                    alt="On location"
-                    className="w-full h-full object-cover"
-                    style={{
-                      filter: "grayscale(15%) contrast(1.05)",
-                      transition: "transform 0.8s ease",
-                    }}
-                    onMouseEnter={(e) =>
-                      (e.target.style.transform = "scale(1.05)")
-                    }
-                    onMouseLeave={(e) =>
-                      (e.target.style.transform = "scale(1)")
-                    }
-                  />
-                </div>
+                {[
+                  ["photo-1519741497674-611481863552", "Studio work"],
+                  ["photo-1465495976277-4387d4b0b4c6", "On location"],
+                ].map(([id, alt]) => (
+                  <div key={id} className="flex-1 overflow-hidden rounded-sm">
+                    <img
+                      src={`https://images.unsplash.com/${id}?auto=format&fit=crop&w=600&q=80`}
+                      alt={alt}
+                      className="w-full h-full object-cover"
+                      style={{
+                        filter: "grayscale(15%) contrast(1.05)",
+                        transition: "transform 0.8s ease",
+                      }}
+                      onMouseEnter={(e) =>
+                        (e.currentTarget.style.transform = "scale(1.05)")
+                      }
+                      onMouseLeave={(e) =>
+                        (e.currentTarget.style.transform = "scale(1)")
+                      }
+                    />
+                  </div>
+                ))}
               </div>
             </div>
           </Reveal>
 
-          {/* Story text */}
           <Reveal delay={200}>
             <div
               className="grid md:grid-cols-2 gap-10 md:gap-16 text-neutral-400 leading-[1.9]"
@@ -690,7 +732,9 @@ const About = () => {
             {achievements.map((a, i) => (
               <Reveal key={i} delay={i * 80}>
                 <div className="achievement-card rounded-2xl p-7">
-                  <div className="gold text-2xl mb-5">{a.icon}</div>
+                  <div className="gold text-2xl mb-5" aria-hidden="true">
+                    {a.icon}
+                  </div>
                   <div className="text-white font-semibold text-base mb-1">
                     {a.title}
                   </div>
@@ -702,7 +746,7 @@ const About = () => {
         </div>
       </section>
 
-      {/* ── CTA STRIP ─────────────────────────────────────────────────── */}
+      {/* ── CTA STRIP (the site footer below this comes from App.jsx) ─── */}
       <section
         className="relative overflow-hidden py-24 md:py-32 px-8 md:px-14 border-t"
         style={{ borderColor: "#111", backgroundColor: "#050505" }}
@@ -717,7 +761,9 @@ const About = () => {
         />
         <div className="max-w-4xl mx-auto text-center relative">
           <Reveal>
-            <span className="gold text-3xl">✦</span>
+            <span className="gold text-3xl" aria-hidden="true">
+              ✦
+            </span>
             <h2
               className="serif font-bold my-6 leading-tight"
               style={{
@@ -732,43 +778,17 @@ const About = () => {
               </em>
             </h2>
             <p className="text-neutral-500 text-lg mb-10 max-w-xl mx-auto leading-relaxed">
-              New York · Available worldwide · Booking 2025–2026
+              Available worldwide · Now booking 2026–2027
             </p>
-            <div className="flex flex-wrap justify-center gap-4">
-              <a href="mailto:hello@alexrivera.com" className="cta-btn">
-                hello@alexrivera.com →
+            <div className="flex flex-wrap justify-center items-center gap-6">
+              <a href={PHONE_LINK} className="cta-btn">
+                Call {PHONE_DISPLAY} →
               </a>
-              <div className="flex gap-3 items-center">
-                <a href="#" className="social-btn">
-                  𝕏
-                </a>
-                <a href="#" className="social-btn">
-                  ◎
-                </a>
-                <a href="#" className="social-btn">
-                  f
-                </a>
-              </div>
+              <SocialLinks />
             </div>
           </Reveal>
         </div>
       </section>
-
-      {/* ── FOOTER ────────────────────────────────────────────────────── */}
-      <footer
-        className="px-8 md:px-14 py-8 flex flex-col md:flex-row items-center justify-between gap-4 border-t"
-        style={{ borderColor: "#111" }}
-      >
-        <div className="flex items-center gap-2">
-          <span className="gold text-sm">✦</span>
-          <span className="text-xs uppercase tracking-[0.25em] text-neutral-700">
-            Alex Rivera
-          </span>
-        </div>
-        <p className="text-xs text-neutral-800">
-          © {new Date().getFullYear()} · Storyteller through light
-        </p>
-      </footer>
     </div>
   );
 };

@@ -9,6 +9,63 @@ const G = "#D4AF37",
 const sp = { type: "spring", stiffness: 400, damping: 20 };
 const YEAR = new Date().getFullYear();
 
+/* ─── Social links — change addresses here only ─────────────────────────── */
+const iconProps = {
+  width: 26,
+  height: 26,
+  viewBox: "0 0 24 24",
+  "aria-hidden": "true",
+};
+const strokeProps = {
+  fill: "none",
+  stroke: "currentColor",
+  strokeWidth: 2.5,
+  strokeLinecap: "round",
+  strokeLinejoin: "round",
+};
+
+const SOCIALS = [
+  {
+    label: "TikTok",
+    href: "https://www.tiktok.com/@mintesinot_g",
+    icon: (
+      <svg {...iconProps} fill="currentColor">
+        <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.77h-3.13v13.17a2.9 2.9 0 1 1-2.9-2.9c.24 0 .47.03.69.08V9.09a6.03 6.03 0 0 0-.69-.04A6.03 6.03 0 1 0 15.82 15V8.34a8.02 8.02 0 0 0 4.69 1.5V6.69h-.92z" />
+      </svg>
+    ),
+  },
+  {
+    label: "Instagram",
+    href: "https://www.instagram.com/minte_gett/",
+    icon: (
+      <svg {...iconProps} {...strokeProps}>
+        <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+        <circle cx="12" cy="12" r="4" />
+        <circle cx="17.5" cy="6.5" r="0.5" fill="currentColor" />
+      </svg>
+    ),
+  },
+  {
+    label: "Facebook group",
+    href: "https://www.facebook.com/groups/1183400838772325/",
+    icon: (
+      <svg {...iconProps} {...strokeProps}>
+        <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
+      </svg>
+    ),
+  },
+  {
+    label: "Telegram",
+    href: "https://t.me/TechStudio_WithMinte",
+    icon: (
+      <svg {...iconProps} fill="currentColor">
+        <path d="M21.5 2.5L2.9 9.7c-1.3.5-1.3 1.2-.2 1.5l4.8 1.5 11.1-7c.5-.3 1-.1.6.3l-9 8.1-.3 4.8c.4 0 .6-.2.9-.4l2.3-2.2 4.7 3.5c.9.5 1.5.2 1.7-.8l3.2-15.1c.3-1.2-.4-1.8-1.2-1.2z" />
+      </svg>
+    ),
+  },
+];
+
+/* ─── Pieces ─────────────────────────────────────────────────────────────── */
 function FadeUp({ children, delay = 0, className = "" }) {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: "-60px" });
@@ -33,10 +90,7 @@ function SocialBtn({ href, label, children }) {
       rel="noopener noreferrer"
       aria-label={label}
       title={label}
-      whileHover={{
-        scale: 1.12,
-        y: -4,
-      }}
+      whileHover={{ scale: 1.12, y: -4 }}
       whileTap={{ scale: 0.96 }}
       transition={sp}
       style={{
@@ -110,7 +164,6 @@ function NavLink({ to, href, children }) {
       />
     </>
   );
-
   const p = {
     style: s,
     onMouseEnter: (e) => (e.currentTarget.style.color = "#fff"),
@@ -241,6 +294,7 @@ function NavCard({ title, items }) {
   );
 }
 
+/* ─── Footer ─────────────────────────────────────────────────────────────── */
 const Footer = () => (
   <>
     <style>{`
@@ -405,93 +459,25 @@ const Footer = () => (
                     }}
                   />
                 </div>
+
                 <div style={{ paddingTop: 8 }}>
                   <p
                     style={{
                       fontSize: 11,
                       letterSpacing: "0.3em",
                       textTransform: "uppercase",
-                      color: "#444",
+                      color: "#777",
                       marginBottom: 12,
                     }}
                   >
                     Follow the work
                   </p>
                   <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
-                    <SocialBtn
-                      href="https://www.tiktok.com/@yourusername"
-                      label="TikTok"
-                    >
-                      <svg
-                        width="26"
-                        height="26"
-                        viewBox="0 0 24 24"
-                        fill="currentColor"
-                      >
-                        <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.77h-3.13v13.17a2.9 2.9 0 1 1-2.9-2.9c.24 0 .47.03.69.08V9.09a6.03 6.03 0 0 0-.69-.04A6.03 6.03 0 1 0 15.82 15V8.34a8.02 8.02 0 0 0 4.69 1.5V6.69h-.92z" />
-                      </svg>
-                    </SocialBtn>
-                    <SocialBtn
-                      href="https://www.instagram.com/yourusername"
-                      label="Instagram"
-                    >
-                      <svg
-                        width="26"
-                        height="26"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2.5"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <rect
-                          x="2"
-                          y="2"
-                          width="20"
-                          height="20"
-                          rx="5"
-                          ry="5"
-                        />
-                        <circle cx="12" cy="12" r="4" />
-                        <circle
-                          cx="17.5"
-                          cy="6.5"
-                          r="0.5"
-                          fill="currentColor"
-                        />
-                      </svg>
-                    </SocialBtn>
-                    <SocialBtn
-                      href="https://facebook.com/yourusername"
-                      label="Facebook"
-                    >
-                      <svg
-                        width="26"
-                        height="26"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2.5"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
-                      </svg>
-                    </SocialBtn>
-                    <SocialBtn
-                      href="https://web.telegram.org/a/"
-                      label="Telegram"
-                    >
-                      <svg
-                        width="20"
-                        height="20"
-                        viewBox="0 0 24 24"
-                        fill="currentColor"
-                      >
-                        <path d="M21.5 2.5L2.9 9.7c-1.3.5-1.3 1.2-.2 1.5l4.8 1.5 11.1-7c.5-.3 1-.1.6.3l-9 8.1-.3 4.8c.4 0 .6-.2.9-.4l2.3-2.2 4.7 3.5c.9.5 1.5.2 1.7-.8l3.2-15.1c.3-1.2-.4-1.8-1.2-1.2z" />
-                      </svg>
-                    </SocialBtn>
+                    {SOCIALS.map(({ label, href, icon }) => (
+                      <SocialBtn key={label} href={href} label={label}>
+                        {icon}
+                      </SocialBtn>
+                    ))}
                   </div>
                 </div>
               </div>
@@ -627,13 +613,7 @@ const Footer = () => (
               background: "rgba(0,0,0,0.25)",
             }}
           >
-            <p
-              style={{
-                color: "#777",
-                fontSize: 12,
-                letterSpacing: "0.04em",
-              }}
-            >
+            <p style={{ color: "#777", fontSize: 12, letterSpacing: "0.04em" }}>
               © {YEAR} Tech Photography. All Rights Reserved.
             </p>
             <p

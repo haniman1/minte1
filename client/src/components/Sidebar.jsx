@@ -5,6 +5,7 @@ import { useLanguage } from "../context/LanguageContext";
 import Button from "./Button";
 
 const GOLD = "#D4AF37";
+const LOGO_SRC = "/logo.png"; // file lives in client/public/logo.png
 
 const TRANSLATIONS = {
   en: {
@@ -27,24 +28,38 @@ const TRANSLATIONS = {
   },
 };
 
+/* Logo image. If the file is missing it falls back to the text brand. */
 function Brand({ small }) {
+  const [failed, setFailed] = useState(false);
+
   return (
     <Link
       to="/"
       aria-label="Tech Photography — Home"
       className="inline-flex items-center no-underline"
     >
-      <span
-        className={`font-bold uppercase tracking-[0.18em] text-white ${small ? "text-xs" : "text-[13px]"}`}
-      >
-        TECH
-      </span>
-      <span
-        className={`ml-1.5 font-bold uppercase tracking-[0.18em] opacity-90 ${small ? "text-xs" : "text-[13px]"}`}
-        style={{ color: GOLD }}
-      >
-        PHOTOGRAPHY
-      </span>
+      {failed ? (
+        <>
+          <span
+            className={`font-bold uppercase tracking-[0.18em] text-white ${small ? "text-xs" : "text-[13px]"}`}
+          >
+            TECH
+          </span>
+          <span
+            className={`ml-1.5 font-bold uppercase tracking-[0.18em] opacity-90 ${small ? "text-xs" : "text-[13px]"}`}
+            style={{ color: GOLD }}
+          >
+            PHOTOGRAPHY
+          </span>
+        </>
+      ) : (
+        <img
+          src={LOGO_SRC}
+          alt="Tech Photography"
+          onError={() => setFailed(true)}
+          className={small ? "h-9 w-auto" : "w-full max-w-[190px] h-auto"}
+        />
+      )}
     </Link>
   );
 }
@@ -130,7 +145,8 @@ export default function Sidebar() {
         id="sidebar"
         className={`fixed inset-y-0 left-0 z-50 flex w-64 flex-col border-r border-white/10 bg-[rgba(6,6,6,0.98)] p-6 transition-transform duration-300 md:translate-x-0 ${open ? "translate-x-0" : "-translate-x-full"}`}
       >
-        <div className="mb-10 mt-1">
+        {/* Logo */}
+        <div className="mb-8 mt-1 border-b border-white/10 pb-6">
           <Brand />
         </div>
 
